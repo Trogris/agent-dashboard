@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Agent Dashboard",
+      "runtimeExecutable": "/Users/charles.andrade/.nvm/versions/node/v20.20.2/bin/node",
+      "runtimeArgs": ["agent-dashboard/server.js"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

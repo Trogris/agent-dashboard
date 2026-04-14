@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TELA INICIAL DE CONFIG -->
+  <div id="setupScreen">
+    <div class="setup-card">
+      <div class="setup-logo">
+        <div class="setup-orb"></div>
+        <h1>Agent Dashboard</h1>
+        <p>Seus agentes de IA em um só lugar</p>
+      </div>
+      <div class="setup-form">
+        <label>Chave da API OpenAI</label>
+        <div class="setup-input-row">
+          <input type="password" id="setupApiKey" placeholder="sk-..." />
+          <button id="setupEnterBtn">Entrar</button>
+        </div>
+        <span class="setup-hint">Sua chave fica salva localmente no navegador.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP PRINCIPAL -->
+  <div id="appScreen" style="display:none">
+
+    <!-- TOPBAR -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <div class="topbar-logo">
+          <div class="topbar-orb"></div>
+          <span>Agents</span>
+        </div>
+        <div class="topbar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar agente ou área..." />
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="view-toggle">
+          <button id="gridViewBtn" class="view-btn active" title="Grade">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </button>
+          <button id="listViewBtn" class="view-btn" title="Lista">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+        <button class="topbar-key-btn" id="changeKeyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          API Key
+        </button>
+      </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div id="layout">
+
+      <!-- PAINEL AGENTES -->
+      <div id="agentsPanel">
+        <div id="agentsContent"></div>
+      </div>
+
+      <!-- CHAT -->
+      <div id="chatPanel" class="chat-empty">
+        <div id="chatEmpty">
+          <div class="empty-orb"></div>
+          <h2>Selecione um agente</h2>
+          <p>Escolha um agente na lista para iniciar uma conversa.</p>
+          <div class="empty-stats" id="emptyStats"></div>
+        </div>
+
+        <div id="chatActive" style="display:none">
+          <div id="chatTopbar">
+            <div class="chat-agent-info">
+              <div class="chat-agent-avatar" id="chatAvatar"></div>
+              <div>
+                <div class="chat-agent-name" id="chatAgentName"></div>
+                <div class="chat-agent-squad" id="chatAgentSquad"></div>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button id="clearBtn" class="chat-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.62"/></svg>
+                Nova conversa
+              </button>
+              <button id="closeChat" class="chat-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="messages"></div>
+
+          <div id="inputArea">
+            <div class="input-wrapper">
+              <textarea id="userInput" placeholder="Mensagem..." rows="1"></textarea>
+              <button id="sendBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL API KEY -->
+  <div id="keyModal" style="display:none">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+      <h3>Alterar chave da API</h3>
+      <input type="password" id="modalApiKey" placeholder="sk-..." />
+      <div class="modal-btns">
+        <button id="modalCancel" class="modal-btn-secondary">Cancelar</button>
+        <button id="modalSave" class="modal-btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
