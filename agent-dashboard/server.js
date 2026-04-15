@@ -17,8 +17,9 @@ const OUTPUTS_DIR = path.join(__dirname, 'outputs');
 if (!process.env.VERCEL && !fs.existsSync(OUTPUTS_DIR)) fs.mkdirSync(OUTPUTS_DIR);
 
 function extractActivationNotice(content) {
-  const match = content.match(/ACTIVATION-NOTICE:\s*(.*?)(?:\n\n|$)/s);
-  return match ? match[1].trim() : null;
+  const idx = content.indexOf('ACTIVATION-NOTICE:');
+  if (idx === -1) return null;
+  return content.slice(idx + 'ACTIVATION-NOTICE:'.length).trim();
 }
 
 function extractTitle(content) {
