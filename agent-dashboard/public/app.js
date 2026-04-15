@@ -320,11 +320,21 @@ function renderAgents(list) {
   }
 }
 
+// ── Persistência de conversas ──
+function saveConversation(agentId) {
+  localStorage.setItem('chat_' + agentId, JSON.stringify(messages));
+}
+function loadConversation(agentId) {
+  try { return JSON.parse(localStorage.getItem('chat_' + agentId)) || null; } catch { return null; }
+}
+function clearConversation(agentId) {
+  localStorage.removeItem('chat_' + agentId);
+}
+
 // ── Activate Agent ──
 function activateAgent(agent, meta) {
   if (!meta) meta = getSquadMeta(agent.squad);
   currentAgent = agent;
-  messages = [];
 
   // Re-render to update active state
   const filtered = getFilteredAgents();
@@ -345,10 +355,18 @@ function activateAgent(agent, meta) {
   const agentModel = getModelForAgent(agent);
   document.getElementById('chatAgentSquad').textContent = meta.label + (agent.title ? ` · ${agent.title}` : '') + ` · ${agentModel}`;
 
-  // Clear and show greeting
-  document.getElementById('messages').innerHTML = '';
-  addMessage('assistant', agent.greeting, meta);
-  messages = [];
+  // Restaura conversa salva ou mostra greeting
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+  const saved = loadConversation(agent.id);
+  if (saved && saved.length > 0) {
+    messages = saved;
+    for (const m of messages) addMessage(m.role, m.content, meta);
+  } else {
+    messages = [];
+    addMessage('assistant', agent.greeting, meta);
+    messages = [];
+  }
 
   document.getElementById('userInput').focus();
 }
@@ -366,6 +384,7 @@ document.getElementById('closeChat').addEventListener('click', () => {
 document.getElementById('clearBtn').addEventListener('click', () => {
   if (!currentAgent) return;
   messages = [];
+  clearConversation(currentAgent.id);
   document.getElementById('messages').innerHTML = '';
   const meta = getSquadMeta(currentAgent.squad);
   addMessage('assistant', currentAgent.greeting, meta);
@@ -628,6 +647,7 @@ async function sendMessage() {
   const meta = getSquadMeta(currentAgent.squad);
   addMessage('user', text, meta);
   messages.push({ role: 'user', content: text });
+  saveConversation(currentAgent.id);
 
   const typing = addTyping();
 
@@ -675,6 +695,7 @@ async function sendMessage() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
     messages.push({ role: 'assistant', content: fullContent });
+    saveConversation(currentAgent.id);
   } catch (err) {
     typing.remove();
     addMessage('assistant', `Erro: ${err.message}`, meta);
