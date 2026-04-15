@@ -21,7 +21,7 @@ const squadMeta = {
   'claude-code-mastery':{ label: 'Claude Code Mastery', icon: 'CC', colorClass: 'mastery'  },
   'movement':           { label: 'Movement',            icon: 'MV', colorClass: 'movement' },
   'problem-solver-squad':{ label: 'Resolução de Problemas', icon: 'RP', colorClass: 'problem' },
-  'geral':              { label: 'Geral',               icon: 'GR', colorClass: 'default'  }
+  'geral':              { label: 'Finanças & Custos',    icon: 'FC', colorClass: 'default'  }
 };
 
 // ── Category groupings by activity type ──
@@ -47,6 +47,10 @@ const activityCategories = {
     label: 'Operações & Problemas',
     squads: ['problem-solver-squad']
   },
+  finance: {
+    label: 'Controladoria & Finanças',
+    squads: ['geral']
+  },
   tech: {
     label: 'Tecnologia & Design',
     squads: ['design-squad', 'cybersecurity', 'claude-code-mastery']
@@ -66,7 +70,7 @@ const appScreen = document.getElementById('appScreen');
 const setupApiKey = document.getElementById('setupApiKey');
 const setupEnterBtn = document.getElementById('setupEnterBtn');
 
-if (apiKey) {
+function showApp() {
   setupScreen.style.display = 'none';
   appScreen.style.display = 'flex';
   appScreen.style.flexDirection = 'column';
@@ -74,16 +78,19 @@ if (apiKey) {
   init();
 }
 
+// Verifica se o servidor já tem a chave configurada no .env
+fetch('/api/config')
+  .then(r => r.json())
+  .then(({ hasServerKey }) => {
+    if (hasServerKey || apiKey) showApp();
+  });
+
 setupEnterBtn.addEventListener('click', () => {
   const val = setupApiKey.value.trim();
   if (!val) return;
   apiKey = val;
   localStorage.setItem('openai_key', apiKey);
-  setupScreen.style.display = 'none';
-  appScreen.style.display = 'flex';
-  appScreen.style.flexDirection = 'column';
-  appScreen.style.height = '100vh';
-  init();
+  showApp();
 });
 
 setupApiKey.addEventListener('keydown', e => {
@@ -352,6 +359,129 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   messages = [];
 });
 
+// ── Executa JavaScript no browser (gera arquivos via SheetJS / jsPDF / PptxGenJS) ──
+async function executeJavaScript(code) {
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+  const fn = new AsyncFunction(code);
+  await fn();
+}
+
+// ── Detecta e renderiza blocos de código com botão de execução ──
+function renderMessageContent(bubble, content) {
+  // Detecta python e javascript
+  const codeRegex = /```(python|javascript)\n([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let match;
+  let hasCode = false;
+
+  bubble.innerHTML = '';
+
+  while ((match = codeRegex.exec(content)) !== null) {
+    hasCode = true;
+    const lang = match[1];
+    const code = match[2];
+
+    // Texto antes do bloco
+    if (match.index > lastIndex) {
+      const textNode = document.createElement('p');
+      textNode.style.cssText = 'margin:0 0 10px;white-space:pre-wrap;';
+      textNode.textContent = content.slice(lastIndex, match.index);
+      bubble.appendChild(textNode);
+    }
+
+    // Bloco de código
+    const codeBlock = document.createElement('div');
+    codeBlock.className = 'code-block';
+    codeBlock.innerHTML = `
+      <div class="code-header">
+        <span>${lang === 'python' ? 'Python' : 'JavaScript'}</span>
+        <button class="run-btn" data-code="${encodeURIComponent(code)}" data-lang="${lang}">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg>
+          Gerar arquivo
+        </button>
+      </div>
+      <pre><code>${escapeHtml(code)}</code></pre>
+    `;
+
+    const resultArea = document.createElement('div');
+    resultArea.className = 'file-result';
+    codeBlock.appendChild(resultArea);
+
+    codeBlock.querySelector('.run-btn').addEventListener('click', async function() {
+      const btn = this;
+      const decodedCode = decodeURIComponent(btn.dataset.code);
+      const language = btn.dataset.lang;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin">⟳</span> Gerando...';
+      resultArea.innerHTML = '';
+
+      try {
+        if (language === 'javascript') {
+          // Executa no browser — funciona em qualquer ambiente
+          await executeJavaScript(decodedCode);
+          resultArea.innerHTML = '<p class="run-ok">Arquivo gerado. Verifique seus downloads.</p>';
+        } else {
+          // Executa via servidor — funciona apenas localmente
+          const res = await fetch('/api/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: decodedCode })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          if (data.files && data.files.length > 0) {
+            resultArea.innerHTML = data.files.map(f => `
+              <a href="${f.url}" download="${f.name}" class="download-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                ${f.name} <span class="file-size">${formatSize(f.size)}</span>
+              </a>
+            `).join('');
+          } else {
+            resultArea.innerHTML = '<p class="run-ok">Executado com sucesso.</p>';
+          }
+        }
+
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg> Gerar arquivo';
+        btn.disabled = false;
+
+      } catch (err) {
+        resultArea.innerHTML = `<p class="run-error">Erro: ${err.message}</p>`;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg> Tentar novamente';
+        btn.disabled = false;
+      }
+    });
+
+    bubble.appendChild(codeBlock);
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Texto após o último bloco
+  if (lastIndex < content.length) {
+    const textNode = document.createElement('p');
+    textNode.style.cssText = 'margin:0;white-space:pre-wrap;';
+    textNode.textContent = content.slice(lastIndex);
+    bubble.appendChild(textNode);
+  }
+
+  if (!hasCode) {
+    bubble.textContent = content;
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 // ── Messages ──
 function addMessage(role, content, meta) {
   if (!meta && currentAgent) meta = getSquadMeta(currentAgent.squad);
@@ -371,7 +501,12 @@ function addMessage(role, content, meta) {
 
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
-  bubble.textContent = content;
+
+  if (role === 'assistant') {
+    renderMessageContent(bubble, content);
+  } else {
+    bubble.textContent = content;
+  }
 
   msg.appendChild(av);
   msg.appendChild(bubble);
@@ -466,11 +601,16 @@ async function sendMessage() {
         try {
           const parsed = JSON.parse(data);
           fullContent += parsed.content;
+          // Durante streaming mostra texto simples
           bubble.textContent = fullContent;
           messagesEl.scrollTop = messagesEl.scrollHeight;
         } catch {}
       }
     }
+
+    // Ao finalizar, re-renderiza com blocos de código e botões
+    renderMessageContent(bubble, fullContent);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
 
     messages.push({ role: 'assistant', content: fullContent });
   } catch (err) {
