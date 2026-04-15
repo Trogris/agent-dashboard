@@ -21,7 +21,8 @@ const squadMeta = {
   'claude-code-mastery':{ label: 'Claude Code Mastery', icon: 'CC', colorClass: 'mastery'  },
   'movement':           { label: 'Movement',            icon: 'MV', colorClass: 'movement' },
   'problem-solver-squad':{ label: 'Resolução de Problemas', icon: 'RP', colorClass: 'problem' },
-  'geral':              { label: 'Finanças & Custos',    icon: 'FC', colorClass: 'default'  }
+  'geral':              { label: 'Finanças & Custos',    icon: 'FC', colorClass: 'default'  },
+  'industrial':         { label: 'Industrial',           icon: 'IN', colorClass: 'industrial' }
 };
 
 // ── Category groupings by activity type ──
@@ -51,6 +52,10 @@ const activityCategories = {
     label: 'Controladoria & Finanças',
     squads: ['geral']
   },
+  industrial: {
+    label: 'Industrial & Operações',
+    squads: ['industrial']
+  },
   tech: {
     label: 'Tecnologia & Design',
     squads: ['design-squad', 'cybersecurity', 'claude-code-mastery']
@@ -73,7 +78,7 @@ const squadOrder = [
   'c-level-squad','advisory-board','problem-solver-squad','hormozi-squad',
   'copy-master','copy-squad','brand-squad','traffic-masters',
   'storytelling','design-squad','data-squad','cybersecurity',
-  'claude-code-mastery','movement','geral'
+  'claude-code-mastery','movement','industrial','geral'
 ];
 
 // ── Setup Screen ──

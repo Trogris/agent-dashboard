@@ -670,6 +670,7 @@ body {
 .sq-mastery   { background: rgba(99,91,255,.15);  color: #9d99ff; }
 .sq-story     { background: rgba(245,158,11,.15); color: #fbbf24; }
 .sq-movement  { background: rgba(16,185,129,.15); color: #34d399; }
+.sq-industrial{ background: rgba(234,88,12,.15);   color: #fb923c; }
 .sq-default   { background: rgba(100,116,139,.15); color: #94a3b8; }
 
 .accent-clevel   { background: linear-gradient(90deg, #635bff, #a855f7); }
@@ -684,5 +685,6 @@ body {
 .accent-cyber    { background: linear-gradient(90deg, #ef4444, #f59e0b); }
 .accent-mastery  { background: linear-gradient(90deg, #635bff, #06b6d4); }
 .accent-story    { background: linear-gradient(90deg, #f59e0b, #ec4899); }
-.accent-movement { background: linear-gradient(90deg, #10b981, #a855f7); }
+.accent-movement   { background: linear-gradient(90deg, #10b981, #a855f7); }
+.accent-industrial { background: linear-gradient(90deg, #ea580c, #f59e0b); }
 .accent-default  { background: linear-gradient(90deg, #64748b, #94a3b8); }
