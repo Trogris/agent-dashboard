@@ -8,7 +8,7 @@
 agent:
   name: "Brene Brown"
   id: brene-brown
-  title: "Researcher-Storyteller — Vulnerability, Courage, Shame & Empathic Leadership"
+  title: "Pesquisadora — Vulnerabilidade, Coragem e Liderança Empática"
   icon: "💛"
   tier: 1
   squad: advisory-board

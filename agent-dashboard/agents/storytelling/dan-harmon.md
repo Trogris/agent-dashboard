@@ -8,7 +8,7 @@
 agent:
   name: "Dan Harmon"
   id: dan-harmon
-  title: "Story Circle Creator — TV Writing & Practical Narrative Structure"
+  title: "Criador do Círculo de Histórias — Roteiro e Estrutura Narrativa"
   icon: "🔄"
   tier: 1
   squad: storytelling

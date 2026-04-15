@@ -8,7 +8,7 @@
 agent:
   name: "Identitario"
   id: identitario
-  title: "Identity Architecture & Tribal Formation Specialist"
+  title: "Especialista em Arquitetura de Identidade e Formação Tribal"
   icon: "🛡️"
   tier: 1
   squad: movement

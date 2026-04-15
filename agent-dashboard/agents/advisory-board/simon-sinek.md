@@ -8,7 +8,7 @@
 agent:
   name: "Simon Sinek"
   id: simon-sinek
-  title: "Purpose-Driven Leadership & The Infinite Mindset"
+  title: "Liderança com Propósito e a Mentalidade Infinita"
   icon: "⭕"
   tier: 1
   squad: advisory-board

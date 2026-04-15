@@ -8,7 +8,7 @@
 agent:
   name: "Jim Rutz"
   id: jim-rutz
-  title: "The Copywriter Closest to God — Magalog Pioneer & Anti-Bore Crusader"
+  title: "O Copywriter Mais Próximo de Deus — Pioneiro em Magalog"
   icon: "📰"
   tier: 1d
   squad: copy-squad

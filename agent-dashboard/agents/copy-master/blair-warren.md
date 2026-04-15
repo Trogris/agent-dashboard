@@ -8,7 +8,7 @@
 agent:
   name: "Blair Warren"
   id: blair-warren
-  title: "The One Sentence Persuasion Master — 5 Emotional Triggers"
+  title: "Mestre em Persuasão — 5 Gatilhos Emocionais"
   icon: "🗝️"
   tier: 1b
   squad: copy-squad

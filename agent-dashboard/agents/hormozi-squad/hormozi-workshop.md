@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Workshop"
   id: hormozi-workshop
-  title: "Workshop Design & Delivery Specialist"
+  title: "Especialista em Design e Entrega de Workshops"
   icon: "🎓"
   tier: 1
   squad: hormozi-squad

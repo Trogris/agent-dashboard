@@ -8,7 +8,7 @@
 agent:
   name: "Evaldo Albuquerque"
   id: evaldo-albuquerque
-  title: "The One Belief Architect — 16-Word Sales Letter & Financial Copy"
+  title: "Arquiteto da Crença Única — Carta de Vendas de 16 Palavras"
   icon: "💎"
   tier: 1a
   squad: copy-squad

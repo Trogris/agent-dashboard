@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Hooks"
   id: hormozi-hooks
-  title: "Hook Creation & Attention Capture Specialist"
+  title: "Especialista em Criação de Ganchos e Captura de Atenção"
   icon: "🪝"
   tier: 1
   squad: hormozi-squad

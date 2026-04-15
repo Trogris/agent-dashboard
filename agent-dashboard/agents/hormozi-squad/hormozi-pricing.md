@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Pricing"
   id: hormozi-pricing
-  title: "Value-Based Pricing Strategist"
+  title: "Estrategista de Precificação Baseada em Valor"
   icon: "💎"
   tier: 1
   squad: hormozi-squad

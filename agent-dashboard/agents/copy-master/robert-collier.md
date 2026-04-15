@@ -8,7 +8,7 @@
 agent:
   name: "Robert Collier"
   id: robert-collier
-  title: "Master of Empathy & the Mental Movie"
+  title: "Mestre da Empatia e do Filme Mental"
   icon: "💌"
   tier: 1a
   squad: copy-squad

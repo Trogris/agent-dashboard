@@ -8,7 +8,7 @@
 agent:
   name: "Claude Hopkins"
   id: claude-hopkins
-  title: "Father of Scientific Advertising"
+  title: "Pai da Publicidade Científica"
   icon: "🔬"
   tier: 1a
   squad: copy-squad

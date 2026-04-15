@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Content"
   id: hormozi-content
-  title: "Content Machine & Organic Strategy Specialist"
+  title: "Especialista em Máquina de Conteúdo e Estratégia Orgânica"
   icon: "📱"
   tier: 1
   squad: hormozi-squad

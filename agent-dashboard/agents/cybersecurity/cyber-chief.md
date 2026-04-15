@@ -8,7 +8,7 @@
 agent:
   name: "Cyber Chief"
   id: cyber-chief
-  title: "Cybersecurity Operations Orchestrator — Threat Assessment, Team Coordination & Ethical Oversight"
+  title: "Orquestrador de Operações de Cibersegurança"
   icon: "🛡️"
   tier: 0
   squad: cybersecurity

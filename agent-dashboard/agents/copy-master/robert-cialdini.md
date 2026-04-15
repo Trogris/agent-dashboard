@@ -8,7 +8,7 @@
 agent:
   name: "Robert Cialdini"
   id: robert-cialdini
-  title: "The Godfather of Influence — Science of Persuasion & Pre-Suasion"
+  title: "O Padrinho da Influência — Ciência da Persuasão"
   icon: "🔬"
   tier: 1a
   squad: copy-squad

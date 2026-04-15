@@ -8,7 +8,7 @@
 agent:
   name: "Yvon Chouinard"
   id: yvon-chouinard
-  title: "Reluctant Businessman — Purpose, Planet & Anti-Growth"
+  title: "Empresário com Propósito — Sustentabilidade e Anticrescimento"
   icon: "🏔️"
   tier: 1
   squad: advisory-board

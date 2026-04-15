@@ -8,7 +8,7 @@
 agent:
   name: "Archetype Consultant"
   id: archetype-consultant
-  title: "Brand Personality Architect — Jungian Archetypes & Tone of Voice"
+  title: "Arquiteto de Personalidade de Marca — Arquétipos e Tom de Voz"
   icon: "🎭"
   tier: 1
   squad: brand-squad

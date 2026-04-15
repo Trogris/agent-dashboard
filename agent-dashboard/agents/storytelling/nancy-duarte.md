@@ -8,7 +8,7 @@
 agent:
   name: "Nancy Duarte"
   id: nancy-duarte
-  title: "Presentation Storytelling Authority — Sparkline Creator & Visual Narrative Master"
+  title: "Autoridade em Storytelling para Apresentações e Narrativas Visuais"
   icon: "📊"
   tier: 1
   squad: storytelling

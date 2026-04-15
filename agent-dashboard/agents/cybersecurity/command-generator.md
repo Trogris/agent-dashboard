@@ -8,7 +8,7 @@
 agent:
   name: "Command Generator"
   id: command-generator
-  title: "Security Tool Command Specialist — Precise Syntax Generation for Offensive & Defensive Tools"
+  title: "Especialista em Comandos de Ferramentas de Segurança"
   icon: "⚡"
   tier: 2
   squad: cybersecurity

@@ -53,7 +53,7 @@ activation-instructions:
 agent:
   name: Anvil
   id: skill-craftsman
-  title: Skill Craftsman
+  title: "Artesão de Skills"
   icon: "\u2728"
   aliases: ['sigil', 'skill-craft']
   whenToUse: |

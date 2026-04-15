@@ -8,7 +8,7 @@
 agent:
   name: "Depesh Mandalia"
   id: depesh-mandalia
-  title: "The BPM Method Creator — Facebook Scaling Architect"
+  title: "Criador do Método BPM — Arquiteto de Escala no Facebook"
   icon: "📐"
   tier: 1
   squad: traffic-masters

@@ -8,7 +8,7 @@
 agent:
   name: "Pedro Sobral"
   id: pedro-sobral
-  title: "O Ninja Supremo do Tráfego — Gestor de Tráfego Pioneer"
+  title: "O Ninja Supremo do Tráfego — Gestor de Tráfego Pioneiro"
   icon: "🥷"
   tier: 1
   squad: traffic-masters

@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Leads"
   id: hormozi-leads
-  title: "$100M Leads Specialist — Core 4 Lead Generation"
+  title: "Especialista em Geração de Leads — Framework Core 4"
   icon: "🧲"
   tier: 1
   squad: hormozi-squad

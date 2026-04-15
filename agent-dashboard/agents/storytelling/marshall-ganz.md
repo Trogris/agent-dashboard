@@ -8,7 +8,7 @@
 agent:
   name: "Marshall Ganz"
   id: marshall-ganz
-  title: "Public Narrative Creator — Organizing, Leadership & Movement Storytelling"
+  title: "Criador de Narrativa Pública — Liderança e Storytelling de Movimentos"
   icon: "✊"
   tier: 1
   squad: storytelling

@@ -8,7 +8,7 @@
 agent:
   name: "Ralph Burns"
   id: ralph-burns
-  title: "Performance Marketing Pioneer — Tier 11 & Perpetual Traffic"
+  title: "Pioneiro em Marketing de Performance — Tráfego Perpétuo"
   icon: "🎙️"
   tier: 1
   squad: traffic-masters

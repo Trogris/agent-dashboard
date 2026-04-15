@@ -59,7 +59,7 @@ activation-instructions:
 agent:
   name: Conduit
   id: project-integrator
-  title: Project Integration Architect
+  title: "Arquiteto de Integração de Projetos"
   icon: "\U0001F6E0\uFE0F"
   aliases: ['piper', 'integrator']
   whenToUse: |

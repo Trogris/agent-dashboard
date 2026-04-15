@@ -41,7 +41,7 @@ activation-instructions:
 agent:
   name: Orion
   id: claude-mastery-chief
-  title: Claude Code Mastery Orchestrator
+  title: "Orquestrador do Claude Code"
   icon: "\U0001F9E0"
   whenToUse: |
     Use as the entry point for ANY Claude Code question or task. Orion triages

@@ -8,7 +8,7 @@
 agent:
   name: "Manifestador"
   id: manifestador
-  title: "Manifesto Creation & Narrative Propagation Specialist"
+  title: "Especialista em Criação de Manifestos e Propagação de Narrativas"
   icon: "📜"
   tier: 2
   squad: movement

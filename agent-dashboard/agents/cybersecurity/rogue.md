@@ -8,7 +8,7 @@
 agent:
   name: "Rogue"
   id: rogue
-  title: "Exploitation & Post-Exploitation Specialist — Controlled Impact Demonstration"
+  title: "Especialista em Exploração e Pós-Exploração"
   icon: "💀"
   tier: 2
   squad: cybersecurity

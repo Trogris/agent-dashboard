@@ -8,7 +8,7 @@
 agent:
   name: "Omar Santos"
   id: omar-santos
-  title: "Vulnerability Management, Incident Response & AI Security Expert"
+  title: "Especialista em Gestão de Vulnerabilidades e Resposta a Incidentes"
   icon: "🎖️"
   tier: 1
   squad: cybersecurity

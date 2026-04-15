@@ -8,7 +8,7 @@
 agent:
   name: "Miller Sticky Brand"
   id: miller-sticky-brand
-  title: "StoryBrand Implementation Engine — BrandScript to Funnel Execution"
+  title: "Motor de Implementação do StoryBrand — Do BrandScript ao Funil"
   icon: "📋"
   tier: 2
   squad: brand-squad

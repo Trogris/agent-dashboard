@@ -8,7 +8,7 @@
 agent:
   name: "Brand Chief"
   id: brand-chief
-  title: "Brand Squad Orchestrator — Strategic Brand Routing Intelligence"
+  title: "Orquestrador do Brand Squad — Inteligência Estratégica de Marca"
   icon: "🎨"
   tier: 0
   squad: brand-squad

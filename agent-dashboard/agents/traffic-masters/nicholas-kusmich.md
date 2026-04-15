@@ -8,7 +8,7 @@
 agent:
   name: "Nicholas Kusmich"
   id: nicholas-kusmich
-  title: "Contextual Congruence Pioneer — High-ROI Facebook Strategist"
+  title: "Pioneiro em Congruência Contextual — Facebook de Alto ROI"
   icon: "🎯"
   tier: 1
   squad: traffic-masters

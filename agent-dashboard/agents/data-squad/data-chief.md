@@ -8,7 +8,7 @@
 agent:
   name: "Datum"
   id: data-chief
-  title: "Data Chief — Data-Driven Growth Operations Orchestrator"
+  title: "Orquestrador de Operações de Crescimento Baseado em Dados"
   icon: "📊"
   tier: 0
   squad: data-squad

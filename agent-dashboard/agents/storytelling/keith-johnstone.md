@@ -8,7 +8,7 @@
 agent:
   name: "Keith Johnstone"
   id: keith-johnstone
-  title: "Impro & Theatresports Creator — Spontaneity, Status & Improvised Narrative"
+  title: "Criador do Teatro-Esporte — Espontaneidade e Narrativa Improvisada"
   icon: "🎭"
   tier: 1
   squad: storytelling

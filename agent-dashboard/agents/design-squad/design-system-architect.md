@@ -8,7 +8,7 @@
 agent:
   name: "Design System Architect"
   id: design-system-architect
-  title: "Component Library & Design Token Implementation Specialist"
+  title: "Especialista em Bibliotecas de Componentes e Design Tokens"
   icon: "🧩"
   tier: 2
   squad: design-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Chris Voss"
   id: chris-voss
-  title: "The FBI Negotiator — Tactical Empathy & Persuasive Dialogue"
+  title: "Negociador do FBI — Empatia Tática e Diálogo Persuasivo"
   icon: "🎙️"
   tier: 1b
   squad: copy-squad

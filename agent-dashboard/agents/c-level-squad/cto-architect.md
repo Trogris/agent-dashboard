@@ -8,7 +8,7 @@
 agent:
   name: "CTO Architect"
   id: cto-architect
-  title: "Technology Strategy & Engineering Leadership Specialist"
+  title: "Especialista em Estratégia Tecnológica e Liderança de Engenharia"
   icon: "🔧"
   tier: 1
   squad: c-level-squad

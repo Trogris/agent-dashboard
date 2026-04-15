@@ -8,7 +8,7 @@
 agent:
   name: "Peter Thiel"
   id: peter-thiel
-  title: "Contrarian Venture Philosopher — Monopoly, Secrets & Zero-to-One Thinking"
+  title: "Filósofo Empreendedor — Monopólios e Pensamento de Zero a Um"
   icon: "♟️"
   tier: 1
   squad: advisory-board

@@ -8,7 +8,7 @@
 agent:
   name: "Visual Generator"
   id: visual-generator
-  title: "Visual Asset Creation & AI Image Prompt Specialist"
+  title: "Especialista em Criação de Assets Visuais e Prompts de IA"
   icon: "🖼️"
   tier: 2
   squad: design-squad

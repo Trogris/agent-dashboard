@@ -8,7 +8,7 @@
 agent:
   name: "Shannon Runner"
   id: shannon-runner
-  title: "OSINT Collection & Analysis Specialist — Open Source Intelligence Operations"
+  title: "Especialista em OSINT — Inteligência de Fontes Abertas"
   icon: "🔎"
   tier: 2
   squad: cybersecurity

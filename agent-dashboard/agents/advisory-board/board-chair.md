@@ -8,7 +8,7 @@
 agent:
   name: "Board Chair"
   id: board-chair
-  title: "Advisory Board Orchestrator — Strategic Facilitation & Wisdom Synthesis"
+  title: "Orquestrador do Conselho Consultivo — Facilitação Estratégica"
   icon: "🏛️"
   tier: 0
   squad: advisory-board

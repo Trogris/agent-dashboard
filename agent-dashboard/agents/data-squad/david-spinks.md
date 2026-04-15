@@ -8,7 +8,7 @@
 agent:
   name: "David Spinks"
   id: david-spinks
-  title: "Community Strategy Pioneer & Community-Led Growth Expert"
+  title: "Pioneiro em Estratégia de Comunidade e Crescimento Liderado por Comunidade"
   icon: "🤝"
   tier: 1
   squad: data-squad

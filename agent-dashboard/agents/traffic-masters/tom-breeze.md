@@ -8,7 +8,7 @@
 agent:
   name: "Tom Breeze"
   id: tom-breeze
-  title: "The YouTube Ads Authority — ADUCATE Formula & Viewability Pioneer"
+  title: "Autoridade em YouTube Ads — Fórmula ADUCATE"
   icon: "🎬"
   tier: 1
   squad: traffic-masters

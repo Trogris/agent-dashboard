@@ -8,7 +8,7 @@
 agent:
   name: "Sabri Suby"
   id: sabri-suby
-  title: "The 8-Phase Selling Machine — Sell Like Crazy & Full-Funnel Strategy"
+  title: "A Máquina de Vendas em 8 Fases — Estratégia de Funil Completo"
   icon: "🦁"
   tier: 1b
   squad: copy-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Emily Heyward"
   id: emily-heyward
-  title: "Startup Brand Architect — 'Obsessed' Author & Red Antler Co-Founder"
+  title: "Arquiteta de Marca para Startups — Autora de Obsessed"
   icon: "🚀"
   tier: 1
   squad: brand-squad

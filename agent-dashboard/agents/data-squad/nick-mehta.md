@@ -8,7 +8,7 @@
 agent:
   name: "Nick Mehta"
   id: nick-mehta
-  title: "Customer Success Pioneer & Net Revenue Retention Evangelist"
+  title: "Pioneiro em Customer Success e Retenção de Receita"
   icon: "💚"
   tier: 1
   squad: data-squad

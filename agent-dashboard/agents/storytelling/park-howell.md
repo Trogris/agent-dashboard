@@ -8,7 +8,7 @@
 agent:
   name: "Park Howell"
   id: park-howell
-  title: "ABT & Story Cycle Creator — Business Storytelling Strategist"
+  title: "Criador do ABT e Ciclo de Histórias — Storytelling para Negócios"
   icon: "🎯"
   tier: 1
   squad: storytelling

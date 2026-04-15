@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Models"
   id: hormozi-models
-  title: "Business Model Selection & Design Specialist"
+  title: "Especialista em Seleção e Design de Modelos de Negócio"
   icon: "🏗️"
   tier: 1
   squad: hormozi-squad

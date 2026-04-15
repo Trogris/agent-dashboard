@@ -8,7 +8,7 @@
 agent:
   name: "Ad Midas"
   id: ad-midas
-  title: "Ad Creative Strategy & Production Specialist"
+  title: "Especialista em Estratégia e Produção de Criativos"
   icon: "✨"
   tier: 1
   squad: traffic-masters

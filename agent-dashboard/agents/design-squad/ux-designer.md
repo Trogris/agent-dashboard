@@ -8,7 +8,7 @@
 agent:
   name: "UX Designer"
   id: ux-designer
-  title: "User Experience Research & Interaction Design Specialist"
+  title: "Especialista em Pesquisa de UX e Design de Interação"
   icon: "👤"
   tier: 2
   squad: design-squad

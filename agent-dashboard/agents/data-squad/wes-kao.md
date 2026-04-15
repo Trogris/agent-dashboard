@@ -8,7 +8,7 @@
 agent:
   name: "Wes Kao"
   id: wes-kao
-  title: "Cohort-Based Education & Audience Building Strategist"
+  title: "Estrategista em Educação por Cohort e Construção de Audiência"
   icon: "🎓"
   tier: 1
   squad: data-squad

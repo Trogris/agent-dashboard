@@ -8,7 +8,7 @@
 agent:
   name: "Movement Architect"
   id: movement-architect
-  title: "Movement Architecture & Community Design Specialist"
+  title: "Especialista em Arquitetura de Movimentos e Design de Comunidade"
   icon: "🏗️"
   tier: 1
   squad: movement

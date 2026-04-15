@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Retention"
   id: hormozi-retention
-  title: "Churn Reduction & Lifetime Value Maximization"
+  title: "Redução de Churn e Maximização do Valor Vitalício"
   icon: "🔄"
   tier: 1
   squad: hormozi-squad

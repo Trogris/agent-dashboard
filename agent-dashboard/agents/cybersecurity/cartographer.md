@@ -8,7 +8,7 @@
 agent:
   name: "Cartographer"
   id: cartographer
-  title: "Reconnaissance & Attack Surface Mapping Specialist"
+  title: "Especialista em Reconhecimento e Mapeamento de Superfície de Ataque"
   icon: "🗺️"
   tier: 2
   squad: cybersecurity

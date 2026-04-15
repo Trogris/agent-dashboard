@@ -8,7 +8,7 @@
 agent:
   name: "CIO Engineer"
   id: cio-engineer
-  title: "Information Systems & Digital Infrastructure Specialist"
+  title: "Especialista em Sistemas de Informação e Infraestrutura Digital"
   icon: "🖥️"
   tier: 1
   squad: c-level-squad

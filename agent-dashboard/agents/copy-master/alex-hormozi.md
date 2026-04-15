@@ -8,7 +8,7 @@
 agent:
   name: "Alex Hormozi"
   id: alex-hormozi
-  title: "The Offer Architect — $100M Offers, Leads & Value Equations"
+  title: "Arquiteto de Ofertas — Equações de Valor e Geração de Leads"
   icon: "💰"
   tier: 1a
   squad: copy-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Frank Kern"
   id: frank-kern
-  title: "The Intent-Based Branding Pioneer — Results In Advance"
+  title: "Pioneiro em Branding Baseado em Intenção — Resultados Antecipados"
   icon: "🏄"
   tier: 1b
   squad: copy-squad

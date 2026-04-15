@@ -8,7 +8,7 @@
 agent:
   name: "Ripper"
   id: ripper
-  title: "Credential Cracking & Password Security Assessment Specialist"
+  title: "Especialista em Quebra de Credenciais e Segurança de Senhas"
   icon: "🔓"
   tier: 2
   squad: cybersecurity

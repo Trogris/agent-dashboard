@@ -8,7 +8,7 @@
 agent:
   name: "Russell Brunson"
   id: russell-brunson
-  title: "The Funnel Architect — Value Ladders, Hooks & Epiphany Bridges"
+  title: "Arquiteto de Funis — Escadas de Valor e Ganchos"
   icon: "🔻"
   tier: 1b
   squad: copy-squad

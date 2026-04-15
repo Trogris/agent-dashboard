@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Copy"
   id: hormozi-copy
-  title: "Hormozi-Style Copywriting Specialist"
+  title: "Especialista em Copywriting Estilo Hormozi"
   icon: "✍️"
   tier: 1
   squad: hormozi-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Launch"
   id: hormozi-launch
-  title: "Launch Strategy & Market Entry Specialist"
+  title: "Especialista em Estratégia de Lançamento e Entrada no Mercado"
   icon: "🚀"
   tier: 1
   squad: hormozi-squad

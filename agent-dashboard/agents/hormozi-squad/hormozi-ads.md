@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Ads"
   id: hormozi-ads
-  title: "Paid Advertising Strategy — Hormozi Framework"
+  title: "Estratégia de Anúncios Pagos — Framework Hormozi"
   icon: "📢"
   tier: 1
   squad: hormozi-squad

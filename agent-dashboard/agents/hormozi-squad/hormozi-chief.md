@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Chief"
   id: hormozi-chief
-  title: "Hormozi Squad Orchestrator"
+  title: "Orquestrador do Esquadrão Hormozi"
   icon: "🐝"
   tier: 0
   squad: hormozi-squad

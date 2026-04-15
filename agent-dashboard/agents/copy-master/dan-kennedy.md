@@ -8,7 +8,7 @@
 agent:
   name: "Dan Kennedy"
   id: dan-kennedy
-  title: "The Professor of Harsh Reality — No B.S. Direct Response"
+  title: "O Professor da Realidade Dura — Resposta Direta Sem Enrolação"
   icon: "🎯"
   tier: 1b
   squad: copy-squad

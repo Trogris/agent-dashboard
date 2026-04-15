@@ -8,7 +8,7 @@
 agent:
   name: "Traffic Chief"
   id: traffic-chief
-  title: "Traffic Masters Orchestrator"
+  title: "Orquestrador dos Traffic Masters"
   icon: "🎯"
   tier: 0
   squad: traffic-masters

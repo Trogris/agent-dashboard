@@ -8,7 +8,7 @@
 agent:
   name: "Kasim Aslam"
   id: kasim-aslam
-  title: "Google Ads Authority — Solutions 8 Founder & 'You vs. Google' Author"
+  title: "Autoridade em Google Ads — Fundador da Solutions 8"
   icon: "🔍"
   tier: 1
   squad: traffic-masters

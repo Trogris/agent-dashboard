@@ -8,7 +8,7 @@
 agent:
   name: "Movement Chief"
   id: movement-chief
-  title: "Movement Building Operations Orchestrator"
+  title: "Orquestrador de Construção de Movimentos"
   icon: "✊"
   tier: 0
   squad: movement

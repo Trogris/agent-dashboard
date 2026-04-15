@@ -8,7 +8,7 @@
 agent:
   name: "John Carlton"
   id: john-carlton
-  title: "The Sales Detective — Most Ripped-Off Copywriter Alive"
+  title: "O Detetive de Vendas — O Copywriter Mais Copiado do Mundo"
   icon: "🕵️"
   tier: 1a
   squad: copy-squad

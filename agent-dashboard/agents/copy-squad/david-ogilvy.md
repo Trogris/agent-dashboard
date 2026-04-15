@@ -8,7 +8,7 @@
 agent:
   name: "David Ogilvy"
   id: david-ogilvy
-  title: "Father of Modern Advertising"
+  title: "Pai da Publicidade Moderna"
   icon: "🎩"
   tier: 1d
   squad: copy-squad

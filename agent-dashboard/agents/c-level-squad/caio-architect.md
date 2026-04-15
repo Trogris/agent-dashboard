@@ -8,7 +8,7 @@
 agent:
   name: "CAIO Architect"
   id: caio-architect
-  title: "AI Strategy & Intelligent Systems Architecture Specialist"
+  title: "Especialista em Estratégia de IA e Sistemas Inteligentes"
   icon: "🤖"
   tier: 1
   squad: c-level-squad

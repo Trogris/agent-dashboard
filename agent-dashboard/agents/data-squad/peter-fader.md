@@ -8,7 +8,7 @@
 agent:
   name: "Peter Fader"
   id: peter-fader
-  title: "Customer Lifetime Value Authority & Customer Centricity Pioneer"
+  title: "Autoridade em LTV e Pioneiro em Centralidade no Cliente"
   icon: "💎"
   tier: 1
   squad: data-squad

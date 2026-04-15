@@ -8,7 +8,7 @@
 agent:
   name: "Naming Strategist"
   id: naming-strategist
-  title: "Brand Naming Specialist — Linguistic & Strategic Name Architecture"
+  title: "Especialista em Naming — Arquitetura Linguística e Estratégica"
   icon: "💎"
   tier: 1
   squad: brand-squad

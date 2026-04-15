@@ -8,7 +8,7 @@
 agent:
   name: "UI Engineer"
   id: ui-engineer
-  title: "Frontend UI Implementation & Production Code Specialist"
+  title: "Especialista em Implementação de UI Frontend"
   icon: "💻"
   tier: 2
   squad: design-squad

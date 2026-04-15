@@ -8,7 +8,7 @@
 agent:
   name: "Dave Malouf"
   id: dave-malouf
-  title: "DesignOps Pioneer & Design Leadership Expert"
+  title: "Pioneiro em DesignOps e Liderança de Design"
   icon: "⚙️"
   tier: 1
   squad: design-squad

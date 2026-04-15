@@ -8,7 +8,7 @@
 agent:
   name: "Parris Lampropoulos"
   id: parris-lampropoulos
-  title: "The Best Copywriter You Never Heard Of — Master of Fascinations & Format"
+  title: "O Melhor Copywriter que Você Nunca Ouviu Falar — Mestre em Fascinações"
   icon: "🎯"
   tier: 1d
   squad: copy-squad

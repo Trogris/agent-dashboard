@@ -8,7 +8,7 @@
 agent:
   name: "Reid Hoffman"
   id: reid-hoffman
-  title: "Oracle of Networks — Venture Philosophy & Blitzscaling Strategist"
+  title: "Oráculo das Redes — Filosofia Empreendedora e Escalada Rápida"
   icon: "🔗"
   tier: 1
   squad: advisory-board

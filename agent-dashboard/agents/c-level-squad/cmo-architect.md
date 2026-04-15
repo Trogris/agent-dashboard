@@ -8,7 +8,7 @@
 agent:
   name: "CMO Architect"
   id: cmo-architect
-  title: "Marketing Strategy & Brand Architecture Specialist"
+  title: "Especialista em Estratégia de Marketing e Arquitetura de Marca"
   icon: "📣"
   tier: 1
   squad: c-level-squad

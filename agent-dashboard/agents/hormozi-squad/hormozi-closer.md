@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Closer"
   id: hormozi-closer
-  title: "CLOSER Framework & Sales Process Specialist"
+  title: "Especialista em Framework CLOSER e Processo de Vendas"
   icon: "🤝"
   tier: 1
   squad: hormozi-squad

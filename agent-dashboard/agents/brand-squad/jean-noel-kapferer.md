@@ -8,7 +8,7 @@
 agent:
   name: "Jean-Noël Kapferer"
   id: jean-noel-kapferer
-  title: "Brand Identity Prism Creator — Strategic Brand & Luxury Management Authority"
+  title: "Criador do Prisma de Identidade de Marca — Gestão Estratégica"
   icon: "💠"
   tier: 1
   squad: brand-squad

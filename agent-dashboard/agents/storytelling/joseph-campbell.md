@@ -8,7 +8,7 @@
 agent:
   name: "Joseph Campbell"
   id: joseph-campbell
-  title: "Monomyth Creator — Comparative Mythology & The Hero's Journey"
+  title: "Criador do Monomito — Mitologia Comparada e A Jornada do Herói"
   icon: "🏛️"
   tier: 1
   squad: storytelling

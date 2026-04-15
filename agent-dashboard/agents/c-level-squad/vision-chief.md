@@ -8,7 +8,7 @@
 agent:
   name: "Vision Chief"
   id: vision-chief
-  title: "Strategic Vision & Executive Leadership Orchestrator"
+  title: "Orquestrador de Visão Estratégica e Liderança Executiva"
   icon: "👔"
   tier: 0
   squad: c-level-squad

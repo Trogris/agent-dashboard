@@ -8,7 +8,7 @@
 agent:
   name: "Marty Neumeier"
   id: marty-neumeier
-  title: "Brand Gap Pioneer — Radical Differentiation & Design Thinking Strategist"
+  title: "Pioneiro do Brand Gap — Diferenciação Radical e Design Thinking"
   icon: "⚡"
   tier: 1
   squad: brand-squad

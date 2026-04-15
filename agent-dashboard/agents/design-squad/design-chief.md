@@ -8,7 +8,7 @@
 agent:
   name: "Design Chief"
   id: design-chief
-  title: "Design Operations Orchestrator — Design Systems, UX & Visual Design Coordination"
+  title: "Orquestrador de Operações de Design — Sistemas, UX e Visual"
   icon: "🎨"
   tier: 0
   squad: design-squad

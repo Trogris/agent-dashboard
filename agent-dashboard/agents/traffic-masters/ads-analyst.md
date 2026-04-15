@@ -8,7 +8,7 @@
 agent:
   name: "Ads Analyst"
   id: ads-analyst
-  title: "Ad Account Audit & Optimization Specialist"
+  title: "Especialista em Auditoria e Otimização de Contas de Anúncio"
   icon: "🔎"
   tier: 1
   squad: traffic-masters

@@ -8,7 +8,7 @@
 agent:
   name: "Dirber"
   id: dirber
-  title: "Network Service Enumeration Specialist — SMB, LDAP, SNMP, RPC & Beyond"
+  title: "Especialista em Enumeração de Serviços de Rede"
   icon: "📂"
   tier: 2
   squad: cybersecurity

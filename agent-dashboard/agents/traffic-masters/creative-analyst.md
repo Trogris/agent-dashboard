@@ -8,7 +8,7 @@
 agent:
   name: "Creative Analyst"
   id: creative-analyst
-  title: "Ad Creative Performance Analysis Specialist"
+  title: "Especialista em Análise de Performance de Criativos"
   icon: "🔬"
   tier: 1
   squad: traffic-masters

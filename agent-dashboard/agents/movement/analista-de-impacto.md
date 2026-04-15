@@ -8,7 +8,7 @@
 agent:
   name: "Analista de Impacto"
   id: analista-de-impacto
-  title: "Impact Measurement & Movement Health Specialist"
+  title: "Especialista em Medição de Impacto e Saúde de Movimentos"
   icon: "📊"
   tier: 2
   squad: movement

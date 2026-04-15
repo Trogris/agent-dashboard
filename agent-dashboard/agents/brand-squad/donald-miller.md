@@ -8,7 +8,7 @@
 agent:
   name: "Donald Miller"
   id: donald-miller
-  title: "StoryBrand Creator — SB7 Framework & Clarified Messaging Pioneer"
+  title: "Criador do StoryBrand — Framework SB7 e Mensagem Clarificada"
   icon: "📖"
   tier: 1
   squad: brand-squad

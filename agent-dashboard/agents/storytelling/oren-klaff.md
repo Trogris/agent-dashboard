@@ -8,7 +8,7 @@
 agent:
   name: "Oren Klaff"
   id: oren-klaff
-  title: "Pitch Anything Creator — Frame Control, Neurofinance & High-Stakes Persuasion"
+  title: "Criador do Pitch Anything — Controle de Frame e Persuasão"
   icon: "🎲"
   tier: 1
   squad: storytelling

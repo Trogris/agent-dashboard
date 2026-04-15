@@ -8,7 +8,7 @@
 agent:
   name: "Gary Halbert"
   id: gary-halbert
-  title: "The Prince of Print — Raw Emotional Storytelling & Street Marketing"
+  title: "Príncipe do Impresso — Storytelling Emocional e Marketing Direto"
   icon: "🔥"
   tier: 1a
   squad: copy-squad

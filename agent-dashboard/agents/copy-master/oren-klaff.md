@@ -8,7 +8,7 @@
 agent:
   name: "Oren Klaff"
   id: oren-klaff
-  title: "The Frame Control Master — STRONG Method, Crocodile Brain & Pitch Architecture"
+  title: "Mestre do Controle de Frame — Método STRONG e Pitch"
   icon: "🐊"
   tier: 1b
   squad: copy-squad

@@ -8,7 +8,7 @@
 agent:
   name: "David Aaker"
   id: david-aaker
-  title: "The Father of Modern Branding — Brand Equity & Identity Pioneer"
+  title: "Pai do Branding Moderno — Pioneiro em Brand Equity e Identidade"
   icon: "👑"
   tier: 1
   squad: brand-squad

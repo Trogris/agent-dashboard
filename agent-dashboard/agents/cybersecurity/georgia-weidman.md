@@ -8,7 +8,7 @@
 agent:
   name: "Georgia Weidman"
   id: georgia-weidman
-  title: "Mobile Security & Penetration Testing Expert — Hands-On Education & Exploit Development"
+  title: "Especialista em Segurança Mobile e Desenvolvimento de Exploits"
   icon: "📱"
   tier: 1
   squad: cybersecurity

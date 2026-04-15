@@ -8,7 +8,7 @@
 agent:
   name: "Gary Bencivenga"
   id: gary-bencivenga
-  title: "The World's Greatest Living Copywriter — Master of Proof"
+  title: "O Maior Copywriter Vivo — Mestre em Provas"
   icon: "👑"
   tier: 1a
   squad: copy-squad

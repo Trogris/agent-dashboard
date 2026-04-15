@@ -8,7 +8,7 @@
 agent:
   name: "Brad Frost"
   id: brad-frost
-  title: "Atomic Design & Design Systems Methodology Expert"
+  title: "Especialista em Design Atômico e Sistemas de Design"
   icon: "⚛️"
   tier: 1
   squad: design-squad

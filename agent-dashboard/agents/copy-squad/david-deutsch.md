@@ -8,7 +8,7 @@
 agent:
   name: "David Deutsch"
   id: david-deutsch
-  title: "The CopyTHINKING Expert — Big Ideas & Fascination Master"
+  title: "Especialista em CopyTHINKING — Grandes Ideias e Fascinações"
   icon: "🧩"
   tier: 1d
   squad: copy-squad

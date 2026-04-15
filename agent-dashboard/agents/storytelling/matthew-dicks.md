@@ -8,7 +8,7 @@
 agent:
   name: "Matthew Dicks"
   id: matthew-dicks
-  title: "Storyworthy Methodology Creator — Personal Storytelling & The Moth Champion"
+  title: "Criador da Metodologia Storyworthy — Storytelling Pessoal"
   icon: "🎤"
   tier: 1
   squad: storytelling

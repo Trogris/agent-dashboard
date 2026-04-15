@@ -8,7 +8,7 @@
 agent:
   name: "Todd Brown"
   id: todd-brown
-  title: "The Marketer's Marketer — Big Ideas & Unique Mechanisms"
+  title: "O Marqueteiro dos Marqueteiros — Grandes Ideias e Mecanismos Únicos"
   icon: "💡"
   tier: 1c
   squad: copy-squad

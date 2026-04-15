@@ -8,7 +8,7 @@
 agent:
   name: "Fuzzer"
   id: fuzzer
-  title: "Input Fuzzing & Parameter Manipulation Specialist"
+  title: "Especialista em Fuzzing e Manipulação de Parâmetros"
   icon: "🎯"
   tier: 2
   squad: cybersecurity

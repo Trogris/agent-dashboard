@@ -8,7 +8,7 @@
 agent:
   name: "Pixel Specialist"
   id: pixel-specialist
-  title: "Tracking, Pixels & Attribution Specialist"
+  title: "Especialista em Rastreamento, Pixels e Atribuição"
   icon: "🔌"
   tier: 1
   squad: traffic-masters

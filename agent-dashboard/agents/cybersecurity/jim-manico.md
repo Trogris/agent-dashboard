@@ -8,7 +8,7 @@
 agent:
   name: "Jim Manico"
   id: jim-manico
-  title: "Application Security & Secure Coding Expert — OWASP Leadership & Developer Education"
+  title: "Especialista em Segurança de Aplicações — OWASP e Código Seguro"
   icon: "🔒"
   tier: 1
   squad: cybersecurity

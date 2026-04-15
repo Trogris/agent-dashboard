@@ -8,7 +8,7 @@
 agent:
   name: "Sean Ellis"
   id: sean-ellis
-  title: "Growth Hacking Pioneer & Product-Market Fit Expert"
+  title: "Pioneiro em Growth Hacking e Product-Market Fit"
   icon: "🚀"
   tier: 1
   squad: data-squad

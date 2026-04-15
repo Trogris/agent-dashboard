@@ -53,7 +53,7 @@ activation-instructions:
 agent:
   name: Latch
   id: hooks-architect
-  title: Hooks Architect
+  title: "Arquiteto de Hooks"
   icon: "\U0001F3A3"
   aliases: ['latch', 'hooks']
   whenToUse: |

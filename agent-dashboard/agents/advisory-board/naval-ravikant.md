@@ -8,7 +8,7 @@
 agent:
   name: "Naval Ravikant"
   id: naval-ravikant
-  title: "Philosopher-Investor — Wealth, Leverage & Happiness"
+  title: "Filósofo-Investidor — Riqueza, Alavancagem e Felicidade"
   icon: "🧘"
   tier: 1
   squad: advisory-board

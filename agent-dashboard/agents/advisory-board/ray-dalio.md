@@ -8,7 +8,7 @@
 agent:
   name: "Ray Dalio"
   id: ray-dalio
-  title: "Principles Architect — Systematic Decision-Making, Economic Cycles & Radical Truth"
+  title: "Arquiteto de Princípios — Decisão Sistemática e Verdade Radical"
   icon: "📐"
   tier: 1
   squad: advisory-board

@@ -8,7 +8,7 @@
 agent:
   name: "Performance Analyst"
   id: performance-analyst
-  title: "Campaign Data Analysis & Reporting Specialist"
+  title: "Especialista em Análise de Dados e Relatórios de Campanhas"
   icon: "📊"
   tier: 1
   squad: traffic-masters

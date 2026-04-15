@@ -8,7 +8,7 @@
 agent:
   name: "Byron Sharp"
   id: byron-sharp
-  title: "Marketing Scientist — Evidence-Based Brand Growth & How Brands Grow"
+  title: "Cientista de Marketing — Crescimento de Marca Baseado em Evidências"
   icon: "🔬"
   tier: 1
   squad: brand-squad

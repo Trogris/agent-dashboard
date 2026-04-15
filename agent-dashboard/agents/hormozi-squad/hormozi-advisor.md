@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Advisor"
   id: hormozi-advisor
-  title: "Strategic Business Advisor — The Hormozi Voice"
+  title: "Consultor Estratégico de Negócios — A Voz Hormozi"
   icon: "🦁"
   tier: 1
   squad: hormozi-squad

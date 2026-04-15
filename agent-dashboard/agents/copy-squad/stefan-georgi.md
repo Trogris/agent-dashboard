@@ -8,7 +8,7 @@
 agent:
   name: "Stefan Georgi"
   id: stefan-georgi
-  title: "The RMBC Architect — $700M in Systematic Copy"
+  title: "Arquiteto do RMBC — Copy Sistemático de Alto Impacto"
   icon: "⚙️"
   tier: 1c
   squad: copy-squad

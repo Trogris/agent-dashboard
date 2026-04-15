@@ -8,7 +8,7 @@
 agent:
   name: "Eugene Schwartz"
   id: eugene-schwartz
-  title: "Master of Market Awareness & Strategic Copy"
+  title: "Mestre em Consciência de Mercado e Copy Estratégico"
   icon: "🧠"
   tier: 1a
   squad: copy-squad

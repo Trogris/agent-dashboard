@@ -8,7 +8,7 @@
 agent:
   name: "Blake Snyder"
   id: blake-snyder
-  title: "Save the Cat Beat Sheet Creator — Commercial Story Structure Master"
+  title: "Criador do Save the Cat — Estrutura de Histórias Comerciais"
   icon: "🎬"
   tier: 1
   squad: storytelling

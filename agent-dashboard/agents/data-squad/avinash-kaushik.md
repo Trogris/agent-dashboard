@@ -8,7 +8,7 @@
 agent:
   name: "Avinash Kaushik"
   id: avinash-kaushik
-  title: "Digital Marketing Evangelist & Web Analytics Authority"
+  title: "Evangelista de Marketing Digital e Autoridade em Analytics"
   icon: "🔍"
   tier: 1
   squad: data-squad

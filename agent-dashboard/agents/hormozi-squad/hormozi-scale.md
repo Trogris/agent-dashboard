@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Scale"
   id: hormozi-scale
-  title: "Business Scaling & Systems Specialist"
+  title: "Especialista em Escalabilidade de Negócios e Sistemas"
   icon: "📈"
   tier: 1
   squad: hormozi-squad

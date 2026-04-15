@@ -8,7 +8,7 @@
 agent:
   name: "Andre Chaperon"
   id: andre-chaperon
-  title: "The Quiet Master of Email Storytelling & the Soap Opera Sequence"
+  title: "Mestre do Storytelling por Email e da Sequência Novela"
   icon: "✉️"
   tier: 1d
   squad: copy-squad

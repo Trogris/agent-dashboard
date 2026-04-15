@@ -8,7 +8,7 @@
 agent:
   name: "Marcus Carey"
   id: marcus-carey
-  title: "Security Leadership, Threat Intelligence & Community Wisdom Expert"
+  title: "Especialista em Liderança em Segurança e Inteligência de Ameaças"
   icon: "🎯"
   tier: 1
   squad: cybersecurity

@@ -8,7 +8,7 @@
 agent:
   name: "Chris Sanders"
   id: chris-sanders
-  title: "Network Security Monitoring & Investigation Theory Expert"
+  title: "Especialista em Monitoramento e Investigação de Segurança de Redes"
   icon: "📡"
   tier: 1
   squad: cybersecurity

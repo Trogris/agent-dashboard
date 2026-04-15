@@ -8,7 +8,7 @@
 agent:
   name: "Story Chief"
   id: story-chief
-  title: "Storytelling Squad Orchestrator — Narrative Intelligence Router"
+  title: "Orquestrador do Storytelling Squad — Roteador de Narrativas"
   icon: "📖"
   tier: 0
   squad: storytelling

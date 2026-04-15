@@ -8,7 +8,7 @@
 agent:
   name: "COO Orchestrator"
   id: coo-orchestrator
-  title: "Operational Excellence & Scaling Specialist"
+  title: "Especialista em Excelência Operacional e Escalabilidade"
   icon: "⚙️"
   tier: 1
   squad: c-level-squad

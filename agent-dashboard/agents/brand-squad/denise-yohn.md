@@ -8,7 +8,7 @@
 agent:
   name: "Denise Lee Yohn"
   id: denise-yohn
-  title: "Brand-Culture Fusion Expert — Operationalizing Brand as Business Management"
+  title: "Especialista em Fusão Marca-Cultura — Operacionalização da Marca"
   icon: "🔗"
   tier: 1
   squad: brand-squad

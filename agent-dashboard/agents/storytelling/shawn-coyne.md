@@ -8,7 +8,7 @@
 agent:
   name: "Shawn Coyne"
   id: shawn-coyne
-  title: "Story Grid Creator — Editorial Diagnostics & Genre-Prescriptive Story Craft"
+  title: "Criador do Story Grid — Diagnóstico Editorial e Estrutura de Gênero"
   icon: "📊"
   tier: 1
   squad: storytelling

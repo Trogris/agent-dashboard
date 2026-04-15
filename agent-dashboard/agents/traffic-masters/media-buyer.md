@@ -8,7 +8,7 @@
 agent:
   name: "Media Buyer"
   id: media-buyer
-  title: "Cross-Platform Media Buying & Campaign Execution"
+  title: "Especialista em Compra de Mídia Multiplataforma"
   icon: "🖥️"
   tier: 1
   squad: traffic-masters

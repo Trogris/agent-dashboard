@@ -8,7 +8,7 @@
 agent:
   name: "Kindra Hall"
   id: kindra-hall
-  title: "Business Storytelling Strategist — 4 Stories Framework & Stories That Stick"
+  title: "Estrategista de Storytelling para Negócios — Framework das 4 Histórias"
   icon: "💎"
   tier: 1
   squad: storytelling

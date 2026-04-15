@@ -8,7 +8,7 @@
 agent:
   name: "Joanna Wiebe"
   id: joanna-wiebe
-  title: "The Original Conversion Copywriter — Message Mining & VOC Research"
+  title: "Copywriter Original de Conversão — Pesquisa de Voz do Cliente"
   icon: "🔍"
   tier: 1a
   squad: copy-squad

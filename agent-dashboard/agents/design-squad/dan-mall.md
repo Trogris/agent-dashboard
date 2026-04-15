@@ -8,7 +8,7 @@
 agent:
   name: "Dan Mall"
   id: dan-mall
-  title: "Design Systems at Scale & Creative Direction Expert"
+  title: "Especialista em Sistemas de Design em Escala e Direção Criativa"
   icon: "🎯"
   tier: 1
   squad: design-squad

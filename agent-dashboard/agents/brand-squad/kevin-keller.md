@@ -8,7 +8,7 @@
 agent:
   name: "Kevin Lane Keller"
   id: kevin-keller
-  title: "CBBE Pyramid Creator — Strategic Brand Management & Brand Equity Measurement"
+  title: "Criador da Pirâmide CBBE — Gestão e Mensuração de Brand Equity"
   icon: "📐"
   tier: 1
   squad: brand-squad

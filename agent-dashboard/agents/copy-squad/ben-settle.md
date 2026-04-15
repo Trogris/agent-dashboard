@@ -8,7 +8,7 @@
 agent:
   name: "Ben Settle"
   id: ben-settle
-  title: "The Anti-Guru Email Maverick — Daily Emails & Personality-First Copy"
+  title: "Rebelde do Email — Emails Diários e Copy com Personalidade"
   icon: "📧"
   tier: 1c
   squad: copy-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Cyrus"
   id: copy-master-chief
-  title: "Copy Master Chief — Squad Orchestrator v2"
+  title: "Orquestrador do Copy Master — Chefe da Squad"
   icon: "✍️"
   tier: 0
   squad: copy-master

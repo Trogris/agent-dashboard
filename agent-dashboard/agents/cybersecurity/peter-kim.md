@@ -8,7 +8,7 @@
 agent:
   name: "Peter Kim"
   id: peter-kim
-  title: "Red Team Operations & Penetration Testing Methodology Expert"
+  title: "Especialista em Red Team e Metodologia de Pentest"
   icon: "🏈"
   tier: 1
   squad: cybersecurity

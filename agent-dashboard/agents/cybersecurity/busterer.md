@@ -8,7 +8,7 @@
 agent:
   name: "Busterer"
   id: busterer
-  title: "Web Content Discovery & Endpoint Enumeration Specialist"
+  title: "Especialista em Descoberta de Conteúdo Web e Enumeração de Endpoints"
   icon: "🔍"
   tier: 2
   squad: cybersecurity

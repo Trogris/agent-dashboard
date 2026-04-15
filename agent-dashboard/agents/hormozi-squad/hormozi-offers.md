@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Offers"
   id: hormozi-offers
-  title: "Grand Slam Offer Architect"
+  title: "Arquiteto de Ofertas Irresistíveis"
   icon: "🎰"
   tier: 1
   squad: hormozi-squad

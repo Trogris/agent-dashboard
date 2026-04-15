@@ -8,7 +8,7 @@
 agent:
   name: "Fenomenologo"
   id: fenomenologo
-  title: "Phenomenological Analysis & Shared Experience Specialist"
+  title: "Especialista em Análise Fenomenológica e Experiências Compartilhadas"
   icon: "🔮"
   tier: 1
   squad: movement

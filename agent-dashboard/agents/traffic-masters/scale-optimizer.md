@@ -8,7 +8,7 @@
 agent:
   name: "Scale Optimizer"
   id: scale-optimizer
-  title: "Campaign Scaling & Efficiency Specialist"
+  title: "Especialista em Escalabilidade e Eficiência de Campanhas"
   icon: "🚀"
   tier: 1
   squad: traffic-masters

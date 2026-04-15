@@ -8,7 +8,7 @@
 agent:
   name: "Derek Sivers"
   id: derek-sivers
-  title: "Minimalist Founder — Simplicity, Contrarian Entrepreneurship & Enough"
+  title: "Fundador Minimalista — Simplicidade e Empreendedorismo Contrário"
   icon: "🎯"
   tier: 1
   squad: advisory-board

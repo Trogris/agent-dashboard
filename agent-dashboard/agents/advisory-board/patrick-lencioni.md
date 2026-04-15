@@ -8,7 +8,7 @@
 agent:
   name: "Patrick Lencioni"
   id: patrick-lencioni
-  title: "Master of Organizational Health & Team Dynamics"
+  title: "Mestre em Saúde Organizacional e Dinâmica de Equipes"
   icon: "🏗️"
   tier: 1
   squad: advisory-board

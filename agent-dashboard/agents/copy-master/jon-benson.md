@@ -8,7 +8,7 @@
 agent:
   name: "Jon Benson"
   id: jon-benson
-  title: "The VSL Inventor — Billion Dollar Copywriter & NLP Master"
+  title: "Inventor do VSL — Copywriter Bilionário e Mestre em PNL"
   icon: "🎬"
   tier: 1c
   squad: copy-squad

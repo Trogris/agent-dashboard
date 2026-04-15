@@ -8,7 +8,7 @@
 agent:
   name: "Industrial Chief"
   id: industrial-chief
-  title: "Strategic, Operational & Problem-Solving Advisor for Industrial Environments"
+  title: "Consultor Estratégico, Operacional e de Resolução de Problemas para Ambientes Industriais"
   tier: 0
   role: unified-orchestrator
   whenToUse: "Qualquer desafio em ambiente industrial: problemas recorrentes, baixa produtividade, retrabalho, falhas de qualidade, maquinas paradas, falta de padrao, gestao de equipe, definicao de metas, estrutura operacional, decisoes estrategicas de operacao."

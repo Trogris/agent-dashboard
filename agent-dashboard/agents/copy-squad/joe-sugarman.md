@@ -8,7 +8,7 @@
 agent:
   name: "Joe Sugarman"
   id: joe-sugarman
-  title: "The Slippery Slide Master — Psychological Triggers & Print Advertising Pioneer"
+  title: "Mestre do Escorregador — Gatilhos Psicológicos e Anúncios Impressos"
   icon: "🕶️"
   tier: 1b
   squad: copy-squad

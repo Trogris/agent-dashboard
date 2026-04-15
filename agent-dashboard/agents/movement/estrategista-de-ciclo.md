@@ -8,7 +8,7 @@
 agent:
   name: "Estrategista de Ciclo"
   id: estrategista-de-ciclo
-  title: "Growth Cycle Strategy & Movement Momentum Specialist"
+  title: "Especialista em Estratégia de Ciclo de Crescimento de Movimentos"
   icon: "🔄"
   tier: 2
   squad: movement

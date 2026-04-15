@@ -8,7 +8,7 @@
 agent:
   name: "Fiscal"
   id: fiscal
-  title: "Ad Budget & Financial Management Specialist"
+  title: "Especialista em Gestão de Orçamento de Anúncios"
   icon: "💰"
   tier: 1
   squad: traffic-masters

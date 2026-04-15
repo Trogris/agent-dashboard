@@ -8,7 +8,7 @@
 agent:
   name: "Hormozi Audit"
   id: hormozi-audit
-  title: "Business Evaluation & Improvement Diagnostician"
+  title: "Diagnosticador de Avaliação e Melhoria de Negócios"
   icon: "🔍"
   tier: 1
   squad: hormozi-squad

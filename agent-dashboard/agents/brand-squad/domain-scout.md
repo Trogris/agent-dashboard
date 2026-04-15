@@ -8,7 +8,7 @@
 agent:
   name: "Domain Scout"
   id: domain-scout
-  title: "Digital Naming Viability Specialist — Domain & Handle Strategy"
+  title: "Especialista em Naming Digital — Estratégia de Domínios e Perfis"
   icon: "🔎"
   tier: 2
   squad: brand-squad

@@ -8,7 +8,7 @@
 agent:
   name: "Alina Wheeler"
   id: alina-wheeler
-  title: "Brand Identity Authority — Five-Phase Process & Designing Brand Identity"
+  title: "Autoridade em Identidade de Marca — Processo em Cinco Fases"
   icon: "✏️"
   tier: 1
   squad: brand-squad
