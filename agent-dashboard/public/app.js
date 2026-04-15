@@ -405,16 +405,29 @@ function renderMessageContent(bubble, content) {
     // Bloco de código
     const codeBlock = document.createElement('div');
     codeBlock.className = 'code-block';
+    const langLabel = lang === 'python' ? 'Python' : 'JavaScript';
     codeBlock.innerHTML = `
       <div class="code-header">
-        <span>${lang === 'python' ? 'Python' : 'JavaScript'}</span>
+        <div class="code-header-left">
+          <span class="code-lang-badge">${langLabel}</span>
+          <button class="code-toggle-btn">ver código</button>
+        </div>
         <button class="run-btn" data-code="${encodeURIComponent(code)}" data-lang="${lang}">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><polygon points="5,3 19,12 5,21"/></svg>
           Gerar arquivo
         </button>
       </div>
-      <pre><code>${escapeHtml(code)}</code></pre>
+      <div class="code-body">
+        <pre><code>${escapeHtml(code)}</code></pre>
+      </div>
     `;
+
+    // Toggle código
+    codeBlock.querySelector('.code-toggle-btn').addEventListener('click', function() {
+      const body = codeBlock.querySelector('.code-body');
+      const expanded = body.classList.toggle('expanded');
+      this.textContent = expanded ? 'ocultar código' : 'ver código';
+    });
 
     const resultArea = document.createElement('div');
     resultArea.className = 'file-result';
@@ -430,11 +443,18 @@ function renderMessageContent(bubble, content) {
 
       try {
         if (language === 'javascript') {
-          // Executa no browser — funciona em qualquer ambiente
           await executeJavaScript(decodedCode);
-          resultArea.innerHTML = '<p class="run-ok">Arquivo gerado. Verifique seus downloads.</p>';
+          resultArea.innerHTML = `
+            <div class="result-success">
+              <div class="result-success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20,6 9,17 4,12"/></svg>
+              </div>
+              <div class="result-success-text">
+                <div class="title">Arquivo gerado com sucesso</div>
+                <div class="sub">Verifique sua pasta de Downloads</div>
+              </div>
+            </div>`;
         } else {
-          // Executa via servidor — funciona apenas localmente
           const res = await fetch('/api/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -443,27 +463,26 @@ function renderMessageContent(bubble, content) {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
           if (data.files && data.files.length > 0) {
-            resultArea.innerHTML = data.files.map(f => `
-              <a href="${f.url}" download="${f.name}" class="download-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                  <polyline points="7,10 12,15 17,10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                ${f.name} <span class="file-size">${formatSize(f.size)}</span>
-              </a>
-            `).join('');
+            resultArea.innerHTML = data.files.map(f => buildDownloadCard(f)).join('');
           } else {
-            resultArea.innerHTML = '<p class="run-ok">Executado com sucesso.</p>';
+            resultArea.innerHTML = `
+              <div class="result-success">
+                <div class="result-success-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20,6 9,17 4,12"/></svg>
+                </div>
+                <div class="result-success-text">
+                  <div class="title">Executado com sucesso</div>
+                </div>
+              </div>`;
           }
         }
 
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg> Gerar arquivo';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><polygon points="5,3 19,12 5,21"/></svg> Gerar arquivo';
         btn.disabled = false;
 
       } catch (err) {
         resultArea.innerHTML = `<p class="run-error">Erro: ${err.message}</p>`;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5,3 19,12 5,21"/></svg> Tentar novamente';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><polygon points="5,3 19,12 5,21"/></svg> Tentar novamente';
         btn.disabled = false;
       }
     });
@@ -483,6 +502,36 @@ function renderMessageContent(bubble, content) {
   if (!hasCode) {
     bubble.textContent = content;
   }
+}
+
+function buildDownloadCard(f) {
+  const ext = f.name.split('.').pop().toLowerCase();
+  const types = {
+    xlsx: { label: 'Excel',      cls: 'file-xlsx', icon: 'XLS' },
+    xls:  { label: 'Excel',      cls: 'file-xlsx', icon: 'XLS' },
+    pdf:  { label: 'PDF',        cls: 'file-pdf',  icon: 'PDF' },
+    pptx: { label: 'PowerPoint', cls: 'file-pptx', icon: 'PPT' },
+    ppt:  { label: 'PowerPoint', cls: 'file-pptx', icon: 'PPT' },
+    docx: { label: 'Word',       cls: 'file-docx', icon: 'DOC' },
+    doc:  { label: 'Word',       cls: 'file-docx', icon: 'DOC' },
+  };
+  const t = types[ext] || { label: ext.toUpperCase(), cls: 'file-default', icon: ext.slice(0,3).toUpperCase() };
+  return `
+    <div class="download-card">
+      <div class="download-file-icon ${t.cls}">${t.icon}</div>
+      <div class="download-info">
+        <div class="download-filename">${f.name}</div>
+        <div class="download-meta">${t.label} · ${formatSize(f.size)}</div>
+      </div>
+      <a href="${f.url}" download="${f.name}" class="download-action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Baixar
+      </a>
+    </div>`;
 }
 
 function escapeHtml(str) {
