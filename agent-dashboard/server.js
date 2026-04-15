@@ -28,7 +28,10 @@ function extractTitle(content) {
 }
 
 function extractGreeting(content) {
-  const match = content.match(/greeting:\s*"([^"]+)"/s);
+  // Only look before the first ```yaml block — greetings inside YAML are in English and ignored
+  const yamlIdx = content.indexOf('```yaml');
+  const searchIn = yamlIdx > -1 ? content.slice(0, yamlIdx) : content;
+  const match = searchIn.match(/greeting:\s*"([^"]+)"/s);
   return match ? match[1].replace(/\\n/g, '\n').trim() : null;
 }
 
@@ -48,7 +51,7 @@ function getAgents() {
         const name = heading ? heading[1].trim() : agentId;
         const title = extractTitle(content) || '';
         const activation = extractActivationNotice(content) || content.substring(0, 500);
-        const greeting = extractGreeting(content) || `Olá! Sou o ${name}. Como posso ajudar?`;
+        const greeting = extractGreeting(content) || `Olá! Sou ${name}${title ? ` — ${title}` : ''}. Como posso ajudar?`;
         agents.push({
           id: squad ? `${squad}/${agentId}` : agentId,
           agentId, squad: squad || 'geral',
