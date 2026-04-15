@@ -77,7 +77,7 @@ app.get('/api/agents', (req, res) => {
 
 // ── Chat ──
 app.post('/api/chat', async (req, res) => {
-  const { messages, systemPrompt, apiKey } = req.body;
+  const { messages, systemPrompt, apiKey, model } = req.body;
   const key = (process.env.OPENAI_API_KEY &&
     !['cole_sua_chave_aqui','cole_sua_nova_chave_aqui'].includes(process.env.OPENAI_API_KEY))
     ? process.env.OPENAI_API_KEY : apiKey;
@@ -85,10 +85,11 @@ app.post('/api/chat', async (req, res) => {
   if (!key) return res.status(400).json({ error: 'Chave da API não configurada.' });
 
   const openai = new OpenAI({ apiKey: key });
+  const selectedModel = model || 'gpt-5.4-mini';
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: selectedModel,
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       stream: true
     });

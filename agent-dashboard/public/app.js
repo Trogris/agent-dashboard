@@ -57,6 +57,18 @@ const activityCategories = {
   }
 };
 
+// ── Determina o modelo por agente ──
+function getModelForAgent(agent) {
+  const powerSquads = ['c-level-squad', 'advisory-board'];
+  const powerKeywords = ['chief', 'orchestrator', 'architect', 'vision', 'board-chair'];
+  if (powerSquads.includes(agent.squad)) return 'gpt-5.4';
+  if (powerKeywords.some(k =>
+    agent.agentId.toLowerCase().includes(k) ||
+    agent.name.toLowerCase().includes(k)
+  )) return 'gpt-5.4';
+  return 'gpt-5.4-mini';
+}
+
 const squadOrder = [
   'c-level-squad','advisory-board','problem-solver-squad','hormozi-squad',
   'copy-master','copy-squad','brand-squad','traffic-masters',
@@ -330,7 +342,8 @@ function activateAgent(agent, meta) {
   document.getElementById('chatAvatar').textContent = getInitials(agent.name);
   document.getElementById('chatAvatar').className = `chat-agent-avatar sq-${meta.colorClass}`;
   document.getElementById('chatAgentName').textContent = agent.name;
-  document.getElementById('chatAgentSquad').textContent = meta.label + (agent.title ? ` · ${agent.title}` : '');
+  const agentModel = getModelForAgent(agent);
+  document.getElementById('chatAgentSquad').textContent = meta.label + (agent.title ? ` · ${agent.title}` : '') + ` · ${agentModel}`;
 
   // Clear and show greeting
   document.getElementById('messages').innerHTML = '';
@@ -573,7 +586,7 @@ async function sendMessage() {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, systemPrompt: currentAgent.systemPrompt, apiKey })
+      body: JSON.stringify({ messages, systemPrompt: currentAgent.systemPrompt, apiKey, model: getModelForAgent(currentAgent) })
     });
 
     if (!res.ok) {
