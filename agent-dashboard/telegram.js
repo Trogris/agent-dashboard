@@ -146,7 +146,9 @@ async function callOrchestrator(orchestrator, messages, agents, openai) {
       parameters: { type: 'object', properties: { task: { type: 'string' } }, required: ['task'] }
     }
   }));
-  const sp = buildSystemPrompt(orchestrator.systemPrompt, orchestrator.id);
+  const delegateNames = delegates.map(a => `- ${a.agentId}: ${a.name} (${a.title})`).join('\n');
+  const orchestrationInstruction = `\n\n---\nINSTRUCAO DE ORQUESTRACAO — REGRA ABSOLUTA:\nVoce e um orquestrador. Voce NAO responde diretamente perguntas que sejam de responsabilidade dos seus especialistas.\nVoce tem os seguintes especialistas disponiveis como ferramentas:\n${delegateNames}\n\nREGRAS:\n1. Sempre que a pergunta tocar a area de um especialista, use a ferramenta correspondente — mesmo sem contexto completo.\n2. Voce pode acionar MULTIPLOS especialistas ao mesmo tempo em chamadas paralelas.\n3. Voce so responde diretamente quando a pergunta for sobre visao geral ou estrategia corporativa.\n4. Apos receber as respostas, sintetize uma visao executiva integrada.\n5. NUNCA peca informacoes antes de consultar os especialistas.`;
+  const sp = buildSystemPrompt(orchestrator.systemPrompt, orchestrator.id) + orchestrationInstruction;
   const first = await openai.chat.completions.create({
     model: 'gpt-5.4',
     messages: [{ role: 'system', content: sp }, ...messages],

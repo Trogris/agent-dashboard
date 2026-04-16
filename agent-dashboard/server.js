@@ -271,13 +271,38 @@ app.post('/api/orchestrate', async (req, res) => {
   const openai = new OpenAI({ apiKey: key });
   const emit = obj => res.write(`data: ${JSON.stringify(obj)}\n\n`);
 
+  // Instrucao de orquestracao injetada no system prompt
+  const delegateNames = delegateAgents.map(a => `- ${a.agentId}: ${a.name} (${a.title})`).join('\n');
+  const orchestrationInstruction = `
+
+---
+INSTRUCAO DE ORQUESTRACAO — REGRA ABSOLUTA:
+Voce e um orquestrador. Voce NAO responde diretamente perguntas que sejam de responsabilidade dos seus especialistas.
+Voce tem os seguintes especialistas disponiveis como ferramentas:
+${delegateNames}
+
+REGRAS:
+1. Sempre que a pergunta tocar a area de um especialista, use a ferramenta correspondente — mesmo sem contexto completo. O especialista vai pedir mais informacoes se precisar.
+2. Voce pode acionar MULTIPLOS especialistas ao mesmo tempo em chamadas paralelas.
+3. Voce so responde diretamente quando a pergunta for sobre visao geral, estrategia corporativa ou algo que genuinamente nao pertence a nenhum especialista.
+4. Apos receber as respostas dos especialistas, voce sintetiza uma visao executiva integrada.
+5. NUNCA peca informacoes antes de consultar os especialistas — deixe isso para eles.`;
+
+  const orchestratorPrompt = buildSystemPrompt(orchestrator.systemPrompt, orchestrator.id) + orchestrationInstruction;
+
   try {
+    // Detecta se a mensagem envolve area de algum especialista
+    // Se a pergunta menciona explicitamente uma area, forca delegacao
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content?.toLowerCase() || '';
+    const delegateKeywords = delegateAgents.flatMap(a => [a.agentId, a.name.toLowerCase(), a.title?.toLowerCase() || '']);
+    const forceDelegate = delegateKeywords.some(kw => kw && lastUserMsg.includes(kw.toLowerCase()));
+
     // First call: orchestrator decides whether to delegate
     const firstResp = await openai.chat.completions.create({
       model: 'gpt-5.4',
-      messages: [{ role: 'system', content: orchestrator.systemPrompt }, ...messages],
+      messages: [{ role: 'system', content: orchestratorPrompt }, ...messages],
       tools,
-      tool_choice: 'auto'
+      tool_choice: forceDelegate ? 'required' : 'auto'
     });
 
     const firstMsg = firstResp.choices[0].message;
@@ -385,7 +410,7 @@ app.post('/api/orchestrate', async (req, res) => {
       const finalResp = await openai.chat.completions.create({
         model: 'gpt-5.4',
         messages: [
-          { role: 'system', content: orchestrator.systemPrompt },
+          { role: 'system', content: orchestratorPrompt },
           ...messages,
           firstMsg,
           ...toolResults
