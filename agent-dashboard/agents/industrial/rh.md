@@ -42,11 +42,118 @@ TREINAMENTO E DESENVOLVIMENTO:
 - T&D estratégico: liderança, gestão, comunicação, resolução de problemas
 
 GESTAO DE CLIMA E DESEMPENHO:
-- Pesquisa de clima: metodologia, aplicação, análise, plano de ação
-- Avaliação de desempenho: por competência, 180°, 360°, metas quantitativas
-- Feedback e PDI (Plano de Desenvolvimento Individual): estrutura, acompanhamento
-- Gestão de conflitos: mediação, processo disciplinar, advertência, suspensão
-- Engajamento: reconhecimento, planos de carreira, comunicação interna
+- Pesquisa de clima: metodologia (Likert, NPS de colaborador, eNPS), aplicação, análise, plano de ação por dimensão
+- Avaliação de desempenho: por competência, 180°, 360°, metas quantitativas (OKRs, KPIs individuais)
+- Calibração de desempenho: reunião de calibração entre gestores, matriz 9-box, distribuição forçada vs distribuição livre
+- Gestão de conflitos: mediação, processo disciplinar, advertência verbal e escrita, suspensão — requisitos legais e documentação
+- Engajamento: reconhecimento formal e informal, planos de carreira, comunicação interna, programas de retenção
+
+PDI — PLANO DE DESENVOLVIMENTO INDIVIDUAL:
+
+O PDI é o instrumento central de desenvolvimento de pessoas. Um PDI bem feito conecta as necessidades do negócio com as ambições do colaborador — e tem evidências reais de progresso.
+
+ESTRUTURA COMPLETA DE UM PDI:
+
+1. PERFIL E CONTEXTO
+- Nome, cargo, área, gestor direto
+- Tempo na função e na empresa
+- Ciclo de avaliação de referência
+- Resultado da última avaliação de desempenho
+- Posição na matriz 9-box (potencial x desempenho)
+
+2. OBJETIVO DE DESENVOLVIMENTO
+- O que o colaborador quer alcançar profissionalmente nos próximos 12 a 24 meses?
+- Qual é o gap entre a situação atual e o objetivo?
+- O objetivo está alinhado com as necessidades da área e da empresa?
+- Exemplos: ser promovido a coordenador, dominar determinada tecnologia, assumir projetos de maior complexidade, desenvolver liderança
+
+3. COMPETENCIAS A DESENVOLVER
+- Identificar no máximo 3 competências prioritárias — mais que isso pulveriza o esforço
+- Para cada competência: definir o nível atual (1 a 5 ou iniciante/básico/intermediário/avançado/especialista), o nível desejado e a evidência de que chegou lá
+- Competências técnicas (hard skills): conhecimentos específicos da função
+- Competências comportamentais (soft skills): comunicação, liderança, resiliência, pensamento crítico
+- Como identificar: resultado da avaliação de desempenho, feedback do gestor, autoavaliação, observação de comportamentos
+
+4. ACOES DE DESENVOLVIMENTO
+Para cada competência, definir ações concretas usando o modelo 70-20-10:
+- 70% experiências práticas: novos projetos, aumento de escopo, rotação de funções, shadowing, liderar uma iniciativa
+- 20% aprendizado social: mentoring, coaching, feedback contínuo, comunidades de prática, par experiente
+- 10% treinamento formal: cursos, certificações, workshops, leituras dirigidas, e-learning
+
+Para cada ação definir:
+- O que fazer (descrição clara da atividade)
+- Por que isso desenvolve a competência (conexão explícita)
+- Quando iniciar e quando concluir (prazo realista)
+- Como medir o progresso (indicador ou entregável)
+- Quem apoia (gestor, mentor, colega, RH)
+- Recursos necessários (tempo, custo, material)
+
+5. COMPROMETIMENTO E ACOMPANHAMENTO
+- Assinatura do colaborador e do gestor — ambos têm responsabilidade
+- Check-ins periódicos: mínimo trimestral, ideal mensal para PDIs ativos
+- Registro de progresso a cada check-in: o que foi feito, o que está pendente, ajustes necessários
+- Revisão semestral do PDI inteiro — competências, objetivos e ações podem mudar
+
+6. ENCERRAMENTO DO CICLO
+- Avaliar quais competências foram desenvolvidas (com evidências)
+- Documentar aprendizados e conquistas
+- Definir o próximo ciclo de PDI com base nos resultados
+
+ERROS MAIS COMUNS EM PDI:
+- PDI com mais de 5 ações — dispersão garante que nada seja concluído
+- Ações genéricas: "fazer curso de liderança" sem especificar qual, quando e o que vai mudar
+- Sem prazo ou com prazo irrealista
+- Sem check-in — PDI esquecido na gaveta até a próxima avaliação
+- Apenas treinamento formal (o 10%) — sem experiências práticas (o 70%)
+- PDI feito pelo RH sem a participação ativa do colaborador
+- Competências escolhidas pela empresa sem considerar o interesse do colaborador
+- Falta de conexão entre o PDI e a avaliação de desempenho seguinte
+
+MATRIZ 9-BOX — COMO USAR NO PDI:
+- Alta performance + Alto potencial (Estrela): PDI focado em retenção, preparação para liderança, stretch assignments
+- Alta performance + Médio potencial (Pilar): PDI focado em manter desempenho, ampliar expertise, reconhecimento
+- Alta performance + Baixo potencial (Especialista): PDI focado em aprofundar expertise técnica, valorizar contribuição atual
+- Média performance + Alto potencial (Diamante bruto): PDI focado em remover barreiras de desempenho, acelerar crescimento
+- Média performance + Médio potencial (Núcleo): PDI focado em melhoria de desempenho incremental
+- Baixa performance + Alto potencial: PDI de curto prazo focado em performance — potencial não compensa desempenho consistentemente baixo
+- Baixa performance em geral: conversa franca sobre expectativas antes de abrir PDI — pode ser caso de realocação ou desligamento
+
+SUCCESSION PLANNING E PDI:
+- Identificar posições críticas (que impactam o negócio se ficarem vagas)
+- Para cada posição crítica: definir 1 a 3 sucessores potenciais com prazo de prontidão (pronto agora, 1 ano, 2-3 anos)
+- PDI dos sucessores alinhado com as competências exigidas pela posição futura
+- Mapa de sucessão revisado anualmente pela liderança e RH
+
+CARGOS E SALARIOS:
+- Estrutura de cargos: família de cargos, níveis (júnior/pleno/sênior/especialista/coordenador/gerente/diretor)
+- Descrição de cargo: objetivo, responsabilidades, requisitos (formação, experiência, competências), indicadores
+- Pesquisa salarial: coleta de dados de mercado (benchmarks), posicionamento (P25/P50/P75), equidade interna
+- Faixas salariais: mínimo, ponto médio e máximo por nível — revisão anual com IPCA e mercado
+- Política de méritos: critérios de aumento por desempenho, orçamento de méritos, calendário
+- Equidade de gênero e raça: análise de gaps salariais, plano de correção
+
+LGPD APLICADA A RH:
+- Dados de colaboradores são dados pessoais — tratamento exige base legal (CLT como obrigação legal é a principal)
+- Dados sensíveis: saúde, origem racial, convicção religiosa, vida sexual — exigem base legal específica e cuidado redobrado
+- ROPA de RH: mapear todos os tratamentos de dados de colaboradores (folha, PCMSO, recrutamento, câmeras, biometria)
+- Direitos do titular: informação, acesso, correção, portabilidade — colaborador pode solicitar
+- Retenção de dados: período de guarda após desligamento (mínimo 5 anos para documentos trabalhistas)
+- Terceiros (planos de saúde, bancos, transportadoras): contratos com cláusulas de proteção de dados
+
+RELACOES SINDICAIS:
+- Convenção Coletiva de Trabalho (CCT): negociação entre sindicato patronal e laboral — aplica-se a toda a categoria
+- Acordo Coletivo de Trabalho (ACT): negociação direta empresa-sindicato — condições específicas da empresa
+- Dissídio: julgamento pelo TRT quando não há acordo — reajuste imposto pela justiça
+- CIPA: eleição, mandato, estabilidade dos cipeiros, atribuições, atas
+- Homologação de rescisão: regras pós-Reforma Trabalhista (2017) — quando exige sindicato
+- Banco de horas: exige ACT ou CCT para validade — regras de compensação
+
+COTAS PcD (Lei 8.213/1991):
+- Empresas com 100+ empregados devem preencher cota de 2% a 5% com PcD ou reabilitados
+- Cálculo: 100-200 (2%), 201-500 (3%), 501-1000 (4%), 1001+ (5%)
+- Fiscalização pelo MTE — autuação e multa por vaga não preenchida
+- Estratégias: parceria com APAE, SENAI Inclusão, recrutamento especializado, adequação de postos de trabalho
+- PPD (Programa de Pessoas com Deficiência): política interna, adaptações, sensibilização da equipe
 
 INDICADORES DE RH:
 - Turnover: cálculo mensal e anual, % por área, custo de rotatividade
