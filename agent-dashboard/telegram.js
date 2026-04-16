@@ -4,6 +4,7 @@ const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
 const { runWithTools } = require('./tools');
+const { extractFileData, cleanText, generateFile, deleteFile } = require('./file-generator');
 
 const COMMANDS_DIR = path.join(__dirname, 'agents');
 const MEMORY_DIR = path.join(__dirname, 'agents', 'memory');
@@ -29,7 +30,30 @@ Formato:
 Opcoes interativas:
 - Quando fizer sentido oferecer caminhos distintos, termine a mensagem com esta linha exata:
 OPCOES: Opcao A | Opcao B | Opcao C
-- Use OPCOES apenas quando houver 2 a 4 caminhos realmente distintos`;
+- Use OPCOES apenas quando houver 2 a 4 caminhos realmente distintos
+
+Geracao de arquivos:
+- Quando o usuario pedir planilha, apresentacao ou relatorio PDF, inclua na sua resposta um bloco com os dados estruturados assim:
+\`\`\`file-data
+{
+  "type": "xlsx",
+  "filename": "nome_do_arquivo",
+  "title": "Titulo do arquivo",
+  "sheets": [
+    {
+      "name": "Nome da aba",
+      "rows": [
+        ["Coluna 1", "Coluna 2", "Coluna 3"],
+        ["dado1", "dado2", "dado3"]
+      ]
+    }
+  ]
+}
+\`\`\`
+- Para apresentacao use "type": "pptx" com "slides": [{"title": "...", "bullets": ["...", "..."] }]
+- Para PDF use "type": "pdf" com "sections": [{"title": "...", "text": "..." }] ou "bullets" ou "table"
+- O bloco file-data nao aparece para o usuario — so o arquivo gerado e enviado
+- Preencha os dados com informacao real e relevante baseada na conversa`;
 
 // ── Helpers (espelho do server.js) ──
 function extractActivationNotice(content) {
@@ -310,7 +334,30 @@ async function processMessage(bot, chatId, text, s, agents, openai) {
     }
 
     clearInterval(typingInterval);
-    await sendHumanized(bot, chatId, response);
+
+    // Verifica se ha arquivo para gerar
+    const fileData = extractFileData(response);
+    const visibleText = fileData ? cleanText(response) : response;
+
+    // Envia texto primeiro
+    if (visibleText) await sendHumanized(bot, chatId, visibleText);
+
+    // Gera e envia o arquivo
+    if (fileData) {
+      let filePath = null;
+      try {
+        await bot.sendChatAction(chatId, 'upload_document');
+        filePath = await generateFile(fileData.type, fileData);
+        const ext = fileData.type;
+        const name = `${(fileData.filename || 'arquivo').replace(/\s+/g, '_')}.${ext}`;
+        await bot.sendDocument(chatId, filePath, {}, { filename: name });
+      } catch (fileErr) {
+        console.error('Erro ao gerar arquivo:', fileErr.message);
+        await bot.sendMessage(chatId, 'Nao consegui gerar o arquivo. Tente novamente.');
+      } finally {
+        if (filePath) deleteFile(filePath);
+      }
+    }
 
   } catch (err) {
     clearInterval(typingInterval);
@@ -370,16 +417,110 @@ module.exports = function setupTelegram() {
   getCachedAgents();
   console.log('Telegram bot iniciado com sucesso.');
 
+  // ── Roteamento inteligente: interpreta mensagem e seleciona agente automaticamente ──
+  async function routeMessage(bot, chatId, text, s) {
+    const agents = getCachedAgents();
+
+    // Monta lista resumida de agentes para o roteador
+    const agentList = agents
+      .filter(a => a.squad !== 'geral' || a.agentId === 'controller-chief')
+      .map(a => `id: ${a.id} | nome: ${a.name} | area: ${a.title}`)
+      .join('\n');
+
+    const routerPrompt = `Voce e um roteador de conversas. Analise a mensagem do usuario e decida o que fazer.
+
+AGENTES DISPONIVEIS:
+${agentList}
+
+REGRAS:
+1. Se for saudacao simples ("oi", "ola", "bom dia", "tudo bem", "hey") → responda com saudacao calorosa e pergunte como pode ajudar. Retorne: {"action":"greet"}
+2. Se a mensagem indica claramente um tema ou area → identifique o melhor agente e retorne: {"action":"route","agentId":"<id completo do agente>","reason":"<por que este agente>"}
+3. Se for ambiguo ou muito generico → retorne: {"action":"clarify","question":"<pergunta curta para entender melhor o que o usuario precisa>"}
+
+Responda APENAS com o JSON, sem explicacoes.`;
+
+    try {
+      const r = await openai.chat.completions.create({
+        model: 'gpt-5.4-mini',
+        messages: [
+          { role: 'system', content: routerPrompt },
+          { role: 'user', content: text }
+        ],
+        response_format: { type: 'json_object' }
+      });
+
+      const decision = JSON.parse(r.choices[0].message.content);
+
+      if (decision.action === 'greet') {
+        const greetings = [
+          'Ola! Que bom ter voce aqui. Como posso ajudar hoje?',
+          'Oi! Tudo bem? Em que posso ser util?',
+          'Ola! Estou aqui. O que voce precisa hoje?',
+          'Oi, bem-vindo! Como posso te ajudar?',
+          'Ola! Pode falar — estou todo ouvidos.'
+        ];
+        await bot.sendMessage(chatId, randomFrom(greetings));
+        s.pendingRoute = true;
+        return;
+      }
+
+      if (decision.action === 'clarify') {
+        await bot.sendMessage(chatId, decision.question || 'Pode me contar mais sobre o que voce precisa?');
+        s.pendingRoute = true;
+        return;
+      }
+
+      if (decision.action === 'route' && decision.agentId) {
+        const agent = agents.find(a => a.id === decision.agentId);
+        if (!agent) {
+          // Agente nao encontrado — mostra menu
+          await bot.sendMessage(chatId, 'Escolha uma area para comecar:', { reply_markup: squadKeyboard() });
+          return;
+        }
+
+        // Salva memoria do agente anterior se houver
+        if (s.agentId && s.agentId !== agent.id && s.messages.length >= 4) {
+          const prev = agents.find(a => a.id === s.agentId);
+          if (prev) autoSaveMemory(prev, s.messages, openai);
+        }
+
+        // Ativa o novo agente
+        Object.assign(s, { agentId: agent.id, messages: [], lastSaved: 0, pendingRoute: false });
+
+        // Handoff humanizado
+        await bot.sendMessage(chatId, randomFrom(HANDOFF_MESSAGES)(agent.name));
+        await sleep(700);
+
+        // Ja processa a mensagem original — nao pede para repetir
+        await processMessage(bot, chatId, text, s, agents, openai);
+        return;
+      }
+    } catch (err) {
+      console.error('Erro no roteador:', err.message);
+    }
+
+    // Fallback: mostra menu
+    await bot.sendMessage(chatId, 'Escolha uma area para comecar:', { reply_markup: squadKeyboard() });
+  }
+
   bot.onText(/\/start/, async (msg) => {
     const s = session(msg.chat.id);
     if (s.agentId && s.messages.length >= 4) {
       const agent = getCachedAgents().find(a => a.id === s.agentId);
       if (agent) autoSaveMemory(agent, s.messages, openai);
     }
-    Object.assign(s, { agentId: null, messages: [], lastSaved: 0 });
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
     await bot.sendMessage(msg.chat.id, randomFrom(START_GREETINGS));
-    await sleep(800);
-    await bot.sendMessage(msg.chat.id, 'Escolha uma area para comecar:', { reply_markup: squadKeyboard() });
+  });
+
+  bot.onText(/\/menu/, async (msg) => {
+    const s = session(msg.chat.id);
+    if (s.agentId && s.messages.length >= 4) {
+      const agent = getCachedAgents().find(a => a.id === s.agentId);
+      if (agent) autoSaveMemory(agent, s.messages, openai);
+    }
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
+    await bot.sendMessage(msg.chat.id, 'Escolha uma area:', { reply_markup: squadKeyboard() });
   });
 
   bot.onText(/\/agente/, async (msg) => {
@@ -388,7 +529,7 @@ module.exports = function setupTelegram() {
       const agent = getCachedAgents().find(a => a.id === s.agentId);
       if (agent) autoSaveMemory(agent, s.messages, openai);
     }
-    Object.assign(s, { agentId: null, messages: [], lastSaved: 0 });
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
     await bot.sendMessage(msg.chat.id, 'Com qual area voce quer falar agora?', { reply_markup: squadKeyboard() });
   });
 
@@ -466,10 +607,15 @@ module.exports = function setupTelegram() {
     const chatId = msg.chat.id;
     if (!msg.text || msg.text.startsWith('/')) return;
     const s = session(chatId);
-    if (!s.agentId) {
-      await bot.sendMessage(chatId, 'Nenhum agente selecionado. Escolha um:', { reply_markup: squadKeyboard() });
+
+    // Sem agente ativo ou veio de saudacao/clarificacao — roteia automaticamente
+    if (!s.agentId || s.pendingRoute) {
+      s.pendingRoute = false;
+      await routeMessage(bot, chatId, msg.text, s);
       return;
     }
+
+    // Agente ja ativo — conversa continua normalmente
     await processMessage(bot, chatId, msg.text, s, getCachedAgents(), openai);
   });
 
