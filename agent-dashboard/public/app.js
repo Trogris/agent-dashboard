@@ -338,7 +338,13 @@ function clearConversation(agentId) {
 
 // ── Activate Agent ──
 function activateAgent(agent, meta) {
+  // Auto-salva memoria do agente anterior antes de trocar
+  if (currentAgent && currentAgent.id !== agent.id && messages.length >= 4) {
+    autoConsolidateMemory(currentAgent, [...messages]);
+  }
+
   if (!meta) meta = getSquadMeta(agent.squad);
+  lastSavedMessageCount = 0;
   currentAgent = agent;
 
   // Re-render to update active state
@@ -358,7 +364,12 @@ function activateAgent(agent, meta) {
   document.getElementById('chatAvatar').className = `chat-agent-avatar sq-${meta.colorClass}`;
   document.getElementById('chatAgentName').textContent = agent.name;
   const agentModel = getModelForAgent(agent);
-  document.getElementById('chatAgentSquad').textContent = meta.label + (agent.title ? ` · ${agent.title}` : '') + ` · ${agentModel}`;
+  const isOrch = agent.delegates && agent.delegates.length > 0;
+  document.getElementById('chatAgentSquad').textContent =
+    meta.label +
+    (agent.title ? ` · ${agent.title}` : '') +
+    ` · ${agentModel}` +
+    (isOrch ? ` · Orquestrador (${agent.delegates.length} especialistas)` : '');
 
   // Restaura conversa salva ou mostra greeting
   const messagesEl = document.getElementById('messages');
@@ -373,11 +384,20 @@ function activateAgent(agent, meta) {
     messages = [];
   }
 
+  // Oculta botoes de memoria — sera atualizado apos verificar status
+  document.getElementById('memoryBadge').style.display = 'none';
+  document.getElementById('consolidateBtn').style.display = 'none';
+  loadMemoryStatus(agent.id);
+
   document.getElementById('userInput').focus();
 }
 
 // ── Close chat ──
 document.getElementById('closeChat').addEventListener('click', () => {
+  // Auto-salva memoria antes de fechar
+  if (currentAgent && messages.length >= 4) {
+    autoConsolidateMemory(currentAgent, [...messages]);
+  }
   document.getElementById('chatPanel').classList.remove('chat-open');
   document.getElementById('chatEmpty').style.display = '';
   document.getElementById('chatActive').style.display = 'none';
@@ -654,13 +674,83 @@ async function sendMessage() {
   messages.push({ role: 'user', content: text });
   saveConversation(currentAgent.id);
 
-  const typing = addTyping();
+  // Orquestradores usam /api/orchestrate; especialistas usam /api/chat
+  const isOrchestrator = currentAgent.delegates && currentAgent.delegates.length > 0;
 
+  if (isOrchestrator) {
+    await sendMessageOrchestrate(meta);
+  } else {
+    await sendMessageChat(meta);
+  }
+
+  isStreaming = false;
+  sendBtn.disabled = false;
+  document.getElementById('userInput').focus();
+
+  // Mostra botao de salvar memoria apos primeira resposta
+  if (messages.length >= 2) {
+    document.getElementById('consolidateBtn').style.display = 'inline-flex';
+  }
+
+  // Auto-salva a cada 10 mensagens em background
+  if (messages.length > 0 && messages.length % 10 === 0) {
+    autoConsolidateMemory(currentAgent, [...messages]);
+  }
+}
+
+// ── Memory ──
+let lastSavedMessageCount = 0;
+
+async function loadMemoryStatus(agentId) {
+  try {
+    const res = await fetch(`/api/memory/${agentId}`);
+    const { hasMemory } = await res.json();
+    document.getElementById('memoryBadge').style.display = hasMemory ? 'inline-flex' : 'none';
+  } catch {}
+}
+
+// Consolidacao silenciosa em background — nao bloqueia UI
+async function autoConsolidateMemory(agent, msgs) {
+  if (!agent || msgs.length < 4) return; // minimo 2 trocas
+  if (msgs.length <= lastSavedMessageCount) return; // nada novo
+  try {
+    const res = await fetch('/api/memory/consolidate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: msgs,
+        agentId: agent.id,
+        agentName: agent.name,
+        apiKey
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      lastSavedMessageCount = msgs.length;
+      document.getElementById('memoryBadge').style.display = 'inline-flex';
+    }
+  } catch {}
+}
+
+// Botao manual de salvar (opcional — para forcar salvamento imediato)
+document.getElementById('consolidateBtn').addEventListener('click', async () => {
+  if (!currentAgent || messages.length === 0) return;
+  const btn = document.getElementById('consolidateBtn');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+  await autoConsolidateMemory(currentAgent, [...messages]);
+  btn.innerHTML = origHtml;
+  btn.disabled = false;
+});
+
+async function sendMessageChat(meta) {
+  const typing = addTyping();
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, systemPrompt: currentAgent.systemPrompt, apiKey, model: getModelForAgent(currentAgent) })
+      body: JSON.stringify({ messages, systemPrompt: currentAgent.systemPrompt, apiKey, model: getModelForAgent(currentAgent), agentId: currentAgent.id })
     });
 
     if (!res.ok) {
@@ -671,6 +761,20 @@ async function sendMessage() {
     typing.remove();
     const bubble = addMessage('assistant', '', meta);
     bubble.textContent = '';
+
+    // Indicador de ferramenta (busca na web, leitura de pagina, etc.)
+    const toolStatus = document.createElement('div');
+    toolStatus.style.cssText = [
+      'font-size:11px;color:var(--text3);margin-bottom:8px;padding:4px 10px;',
+      'background:var(--surface2);border-radius:6px;display:none;',
+      'border-left:2px solid rgba(99,91,255,.4);'
+    ].join('');
+    bubble.parentElement.insertBefore(toolStatus, bubble);
+
+    const TOOL_LABELS = {
+      buscar_na_web: q => `Buscando na web: "${q}"`,
+      ler_pagina: u => `Lendo pagina: ${u}`,
+    };
 
     let fullContent = '';
     const reader = res.body.getReader();
@@ -687,26 +791,107 @@ async function sendMessage() {
         if (data === '[DONE]') break;
         try {
           const parsed = JSON.parse(data);
-          fullContent += parsed.content;
-          // Durante streaming mostra texto simples
-          bubble.textContent = fullContent;
-          messagesEl.scrollTop = messagesEl.scrollHeight;
+          if (parsed.type === 'tool_use') {
+            const labelFn = TOOL_LABELS[parsed.tool];
+            const arg = parsed.args?.query || parsed.args?.url || parsed.tool;
+            toolStatus.textContent = labelFn ? labelFn(arg) : `Usando ferramenta: ${parsed.tool}`;
+            toolStatus.style.display = 'block';
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          } else if (parsed.content) {
+            toolStatus.style.display = 'none'; // esconde apos receber conteudo
+            fullContent += parsed.content;
+            bubble.textContent = fullContent;
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          }
         } catch {}
       }
     }
 
-    // Ao finalizar, re-renderiza com blocos de código e botões
+    toolStatus.remove();
     renderMessageContent(bubble, fullContent);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-
     messages.push({ role: 'assistant', content: fullContent });
     saveConversation(currentAgent.id);
   } catch (err) {
     typing.remove();
     addMessage('assistant', `Erro: ${err.message}`, meta);
-  } finally {
-    isStreaming = false;
-    sendBtn.disabled = false;
-    input.focus();
+  }
+}
+
+async function sendMessageOrchestrate(meta) {
+  const typing = addTyping();
+  const messagesEl = document.getElementById('messages');
+
+  // Status bar para mostrar delegações em andamento
+  const statusEl = document.createElement('div');
+  statusEl.style.cssText = [
+    'font-size:11px;color:var(--text3);margin-top:8px;padding:5px 10px;',
+    'background:var(--surface2);border-radius:6px;display:none;',
+    'border-left:2px solid rgba(99,91,255,.4);'
+  ].join('');
+  typing.querySelector('.msg-bubble').appendChild(statusEl);
+
+  let bubble = null;
+  let fullContent = '';
+
+  try {
+    const res = await fetch('/api/orchestrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, agentId: currentAgent.id, apiKey })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Erro na orquestração');
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const lines = decoder.decode(value).split('\n');
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'delegation') {
+            statusEl.style.display = 'block';
+            statusEl.textContent = `Consultando ${parsed.agentName}...`;
+          } else if (parsed.type === 'synthesis') {
+            statusEl.textContent = 'Sintetizando analises dos especialistas...';
+          } else if (parsed.type === 'content') {
+            if (!bubble) {
+              typing.remove();
+              bubble = addMessage('assistant', '', meta);
+              bubble.textContent = '';
+            }
+            fullContent += parsed.content;
+            bubble.textContent = fullContent;
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          } else if (parsed.type === 'error') {
+            throw new Error(parsed.error);
+          }
+        } catch (e) {
+          if (e.message && !e.message.includes('JSON')) throw e;
+        }
+      }
+    }
+
+    if (bubble) {
+      renderMessageContent(bubble, fullContent);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    } else {
+      typing.remove();
+    }
+    messages.push({ role: 'assistant', content: fullContent });
+    saveConversation(currentAgent.id);
+  } catch (err) {
+    typing.remove();
+    addMessage('assistant', `Erro na orquestracao: ${err.message}`, meta);
   }
 }
