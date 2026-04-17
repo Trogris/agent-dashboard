@@ -946,6 +946,7 @@ async function sendMessageChat(meta) {
     };
 
     let fullContent = '';
+    let fileDetected = false;
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     const messagesEl = document.getElementById('messages');
@@ -967,9 +968,21 @@ async function sendMessageChat(meta) {
             toolStatus.style.display = 'block';
             messagesEl.scrollTop = messagesEl.scrollHeight;
           } else if (parsed.content) {
-            toolStatus.style.display = 'none'; // esconde apos receber conteudo
+            toolStatus.style.display = 'none';
             fullContent += parsed.content;
-            bubble.textContent = fullContent;
+
+            // Detecta inicio do bloco file-data durante streaming
+            if (!fileDetected && fullContent.includes('```file-data')) {
+              fileDetected = true;
+              const typeMatch = fullContent.match(/"type"\s*:\s*"(\w+)"/);
+              const typeLabel = { xlsx: 'Excel', pdf: 'PDF', pptx: 'PowerPoint' }[typeMatch?.[1]] || 'arquivo';
+              bubble.innerHTML = `<div class="file-generating">
+                <div class="file-generating-spinner"></div>
+                Gerando ${typeLabel}...
+              </div>`;
+            } else if (!fileDetected) {
+              bubble.textContent = fullContent;
+            }
             messagesEl.scrollTop = messagesEl.scrollHeight;
           }
         } catch {}
@@ -977,8 +990,14 @@ async function sendMessageChat(meta) {
     }
 
     toolStatus.remove();
-    renderMessageContent(bubble, fullContent);
-    await handleFileData(fullContent, messagesEl);
+
+    if (fileDetected) {
+      // Mostra so o card de download, sem texto
+      bubble.innerHTML = '';
+      await handleFileData(fullContent, messagesEl);
+    } else {
+      renderMessageContent(bubble, fullContent);
+    }
     messagesEl.scrollTop = messagesEl.scrollHeight;
     messages.push({ role: 'assistant', content: fullContent });
     saveConversation(currentAgent.id);
@@ -1003,6 +1022,7 @@ async function sendMessageOrchestrate(meta) {
 
   let bubble = null;
   let fullContent = '';
+  let fileDetected = false;
 
   try {
     const res = await fetch('/api/orchestrate', {
@@ -1041,7 +1061,18 @@ async function sendMessageOrchestrate(meta) {
               bubble.textContent = '';
             }
             fullContent += parsed.content;
-            bubble.textContent = fullContent;
+
+            if (!fileDetected && fullContent.includes('```file-data')) {
+              fileDetected = true;
+              const typeMatch = fullContent.match(/"type"\s*:\s*"(\w+)"/);
+              const typeLabel = { xlsx: 'Excel', pdf: 'PDF', pptx: 'PowerPoint' }[typeMatch?.[1]] || 'arquivo';
+              bubble.innerHTML = `<div class="file-generating">
+                <div class="file-generating-spinner"></div>
+                Gerando ${typeLabel}...
+              </div>`;
+            } else if (!fileDetected) {
+              bubble.textContent = fullContent;
+            }
             messagesEl.scrollTop = messagesEl.scrollHeight;
           } else if (parsed.type === 'error') {
             throw new Error(parsed.error);
@@ -1053,8 +1084,13 @@ async function sendMessageOrchestrate(meta) {
     }
 
     if (bubble) {
-      renderMessageContent(bubble, fullContent);
-      await handleFileData(fullContent, messagesEl);
+      if (fileDetected) {
+        bubble.innerHTML = '';
+        await handleFileData(fullContent, messagesEl);
+      } else {
+        renderMessageContent(bubble, fullContent);
+        await handleFileData(fullContent, messagesEl);
+      }
       messagesEl.scrollTop = messagesEl.scrollHeight;
     } else {
       typing.remove();
