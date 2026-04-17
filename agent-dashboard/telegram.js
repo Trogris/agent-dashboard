@@ -59,6 +59,37 @@ Geracao de arquivos:
 - O bloco file-data nao aparece para o usuario — so o arquivo gerado e enviado
 - Preencha os dados com informacao real e relevante baseada na conversa`;
 
+// ── Mapa de vozes por squad ──
+// Femininas: nova (quente, proxima), shimmer (clara, formal)
+// Masculinas: onyx (grave, autoritario), echo (equilibrado), fable (narrativo), alloy (neutro tecnico)
+const SQUAD_VOICES = {
+  'geral':               'shimmer', // Controladoria/Financas — mulher, formal
+  'industrial':          'shimmer', // Industrial tem RH/pessoas — mulher
+  'c-level-squad':       'onyx',    // C-Level — grave, autoritario
+  'advisory-board':      'onyx',    // Advisory — experiente, peso
+  'hormozi-squad':       'onyx',    // Hormozi — direto, forcoso
+  'copy-master':         'fable',   // Copy — expressivo, narrativo
+  'copy-squad':          'fable',   // Copy — idem
+  'storytelling':        'fable',   // Storytelling — narrativo por excelencia
+  'brand-squad':         'nova',    // Brand — quente, criativo
+  'traffic-masters':     'echo',    // Traffic — equilibrado, analitico
+  'data-squad':          'alloy',   // Data — neutro, tecnico
+  'design-squad':        'nova',    // Design — criativo, proximo
+  'cybersecurity':       'echo',    // Cyber — seco, preciso
+  'claude-code-mastery': 'alloy',   // Tech — neutro, tecnico
+  'movement':            'shimmer', // Movement — clara, inspiradora
+  'problem-solver-squad':'echo',    // Problem solver — equilibrado
+};
+
+// Agentes especificos que tem RH/Pessoas sobrepoe o squad
+const AGENT_VOICES = {
+  'industrial-chief': 'nova', // se tiver agente de RH industrial
+};
+
+function getAgentVoice(agent) {
+  return AGENT_VOICES[agent.agentId] || SQUAD_VOICES[agent.squad] || 'alloy';
+}
+
 // ── Helpers (espelho do server.js) ──
 function extractActivationNotice(content) {
   const idx = content.indexOf('ACTIVATION-NOTICE:');
@@ -308,7 +339,7 @@ function agentKeyboard(agents, squad) {
 }
 
 // ── Processamento de mensagem (reutilizado por texto e botoes) ──
-async function processMessage(bot, chatId, text, s, agents, openai) {
+async function processMessage(bot, chatId, text, s, agents, openai, replyWithVoice = false) {
   const agent = agents.find(a => a.id === s.agentId);
   if (!agent) return;
 
@@ -343,8 +374,13 @@ async function processMessage(bot, chatId, text, s, agents, openai) {
     const fileData = extractFileData(response);
     const visibleText = fileData ? cleanFileData(response) : response;
 
-    // Envia texto primeiro
-    if (visibleText) await sendHumanized(bot, chatId, visibleText);
+    // Envia resposta — voz ou texto
+    const useVoice = replyWithVoice || s.voiceMode;
+    if (useVoice && visibleText && !fileData) {
+      await sendVoiceReply(chatId, visibleText, getAgentVoice(agent));
+    } else if (visibleText) {
+      await sendHumanized(bot, chatId, visibleText);
+    }
 
     // Gera e envia o arquivo
     if (fileData) {
@@ -413,8 +449,43 @@ module.exports = function setupTelegram() {
   const sessions = new Map();
 
   function session(chatId) {
-    if (!sessions.has(chatId)) sessions.set(chatId, { agentId: null, messages: [], lastSaved: 0, greeted: false });
+    if (!sessions.has(chatId)) sessions.set(chatId, { agentId: null, messages: [], lastSaved: 0, greeted: false, voiceMode: false });
     return sessions.get(chatId);
+  }
+
+  // ── TTS: converte texto em audio e envia como mensagem de voz ──
+  async function sendVoiceReply(chatId, text, voice) {
+    let tmpPath = null;
+    try {
+      const clean = text
+        .replace(/```[\s\S]*?```/g, '')   // remove blocos de codigo
+        .replace(/`[^`]+`/g, '')           // remove inline code
+        .replace(/\*\*(.*?)\*\*/g, '$1')   // remove bold
+        .replace(/__(.*?)__/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/_(.*?)_/g, '$1')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/\n{2,}/g, ' ')
+        .trim()
+        .slice(0, 4000); // limite da API
+
+      const mp3 = await openai.audio.speech.create({
+        model: 'tts-1',
+        voice: voice || 'alloy',
+        input: clean,
+        response_format: 'opus',
+        speed: 1.0
+      });
+
+      tmpPath = path.join(os.tmpdir(), `tg_tts_${Date.now()}.ogg`);
+      const buffer = Buffer.from(await mp3.arrayBuffer());
+      fs.writeFileSync(tmpPath, buffer);
+      await bot.sendVoice(chatId, tmpPath);
+    } catch (err) {
+      console.error('Erro TTS:', err.message);
+    } finally {
+      if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+    }
   }
 
   // Pre-carrega agentes ao iniciar
@@ -549,6 +620,15 @@ Responda APENAS com o JSON, sem explicacoes.`;
     await bot.sendMessage(msg.chat.id, 'Conversa limpa. Agente e memoria preservados.');
   });
 
+  bot.onText(/\/voz/, async (msg) => {
+    const s = session(msg.chat.id);
+    s.voiceMode = !s.voiceMode;
+    await bot.sendMessage(msg.chat.id, s.voiceMode
+      ? 'Modo voz ativado. O agente vai responder em audio.'
+      : 'Modo voz desativado. Respostas em texto novamente.'
+    );
+  });
+
   bot.onText(/\/status/, async (msg) => {
     const s = session(msg.chat.id);
     if (!s.agentId) { await bot.sendMessage(msg.chat.id, 'Nenhum agente ativo. Use /start.'); return; }
@@ -647,7 +727,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
       const text = transcription.text?.trim();
       if (!text) { await bot.sendMessage(chatId, 'Nao consegui entender o audio. Tente novamente.'); return; }
       if (!s.agentId) { await routeMessage(bot, chatId, text, s); return; }
-      await processMessage(bot, chatId, text, s, getCachedAgents(), openai);
+      await processMessage(bot, chatId, text, s, getCachedAgents(), openai, true);
     } catch (err) {
       console.error('Erro audio:', err.message);
       await bot.sendMessage(chatId, 'Erro ao processar o audio. Tente novamente.');
