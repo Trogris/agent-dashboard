@@ -646,7 +646,6 @@ Responda APENAS com o JSON, sem explicacoes.`;
       });
       const text = transcription.text?.trim();
       if (!text) { await bot.sendMessage(chatId, 'Nao consegui entender o audio. Tente novamente.'); return; }
-      await bot.sendMessage(chatId, `_${text}_`, { parse_mode: 'Markdown' });
       if (!s.agentId) { await routeMessage(bot, chatId, text, s); return; }
       await processMessage(bot, chatId, text, s, getCachedAgents(), openai);
     } catch (err) {
