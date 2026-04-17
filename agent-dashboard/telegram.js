@@ -493,7 +493,7 @@ module.exports = function setupTelegram() {
   console.log('Telegram bot iniciado com sucesso.');
 
   // ── Roteamento inteligente: interpreta mensagem e seleciona agente automaticamente ──
-  async function routeMessage(bot, chatId, text, s) {
+  async function routeMessage(bot, chatId, text, s, replyWithVoice = false) {
     const agents = getCachedAgents();
 
     // Monta lista resumida de agentes para o roteador
@@ -573,7 +573,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
         await bot.sendMessage(chatId, randomFrom(HANDOFF_MESSAGES)(agent.name));
         await sleep(700);
 
-        await processMessage(bot, chatId, text, s, agents, openai);
+        await processMessage(bot, chatId, text, s, agents, openai, replyWithVoice);
         return;
       }
     } catch (err) {
@@ -726,7 +726,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
       });
       const text = transcription.text?.trim();
       if (!text) { await bot.sendMessage(chatId, 'Nao consegui entender o audio. Tente novamente.'); return; }
-      if (!s.agentId) { await routeMessage(bot, chatId, text, s); return; }
+      if (!s.agentId) { await routeMessage(bot, chatId, text, s, true); return; }
       await processMessage(bot, chatId, text, s, getCachedAgents(), openai, true);
     } catch (err) {
       console.error('Erro audio:', err.message);
