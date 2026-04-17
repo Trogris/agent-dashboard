@@ -367,7 +367,11 @@ async function sendVoiceReply(bot, openai, chatId, text, voice) {
     fs.writeFileSync(tmpPath, buffer);
     await bot.sendVoice(chatId, tmpPath);
   } catch (err) {
-    console.error('Erro TTS:', err.message);
+    console.error('Erro TTS:', err.message || err);
+    // Tenta enviar texto como fallback se o TTS falhar
+    try {
+      await bot.sendMessage(chatId, text.slice(0, 4000));
+    } catch {}
   } finally {
     if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
   }
@@ -871,13 +875,31 @@ Responda APENAS com o JSON, sem explicacoes.`;
     }
   });
 
+  // Reconecta automaticamente em caso de queda de rede
+  let reconnectTimer = null;
   bot.on('polling_error', err => {
-    if (err.code !== 'ETELEGRAM') console.error('Telegram polling:', err.message);
+    console.error('Telegram polling erro:', err.code, err.message);
+    const reconectavel = ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'EFATAL'].some(c =>
+      err.code === c || err.message?.includes(c)
+    );
+    if (reconectavel && !reconnectTimer) {
+      reconnectTimer = setTimeout(async () => {
+        reconnectTimer = null;
+        console.log('Reconectando ao Telegram...');
+        try {
+          await bot.stopPolling();
+          await sleep(2000);
+          await bot.startPolling();
+          console.log('Telegram reconectado.');
+        } catch (e) {
+          console.error('Falha ao reconectar:', e.message);
+        }
+      }, 5000);
+    }
   });
 
-  // Evita que erros do Telegram derrubem o processo inteiro
   process.on('unhandledRejection', err => {
-    if (err?.code === 'ETELEGRAM') return; // ignora erros esperados do Telegram
+    if (err?.code === 'ETELEGRAM') return;
     console.error('Unhandled rejection:', err?.message);
   });
 };
