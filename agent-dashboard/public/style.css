@@ -15,6 +15,19 @@
   --shadow: 0 8px 32px rgba(0,0,0,.4);
 }
 
+[data-theme="light"] {
+  --bg: #f0f2f8;
+  --surface: #ffffff;
+  --surface2: #f0f2f8;
+  --surface3: #e4e7f0;
+  --border: #d4d8e8;
+  --border2: #bec4d8;
+  --text: #0f1120;
+  --text2: #3d4466;
+  --text3: #7880a0;
+  --shadow: 0 8px 32px rgba(0,0,0,.08);
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
@@ -748,3 +761,56 @@ body {
 }
 .download-action-btn:hover { background: rgba(99,91,255,.25); }
 .download-action-btn:disabled { opacity: .5; cursor: default; }
+
+/* ── Botao de tema ── */
+.topbar-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 9px;
+  color: var(--text2); cursor: pointer; transition: all .2s;
+}
+.topbar-icon-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── Ajustes modo claro ── */
+[data-theme="light"] .msg.user .msg-bubble {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+}
+[data-theme="light"] .msg.assistant .msg-bubble {
+  background: #ffffff;
+  border-color: var(--border2);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+[data-theme="light"] #chatTopbar {
+  background: var(--surface);
+}
+[data-theme="light"] #inputArea {
+  background: var(--surface);
+}
+[data-theme="light"] .input-wrapper {
+  background: var(--surface2);
+  border-color: var(--border2);
+}
+[data-theme="light"] .agent-card {
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+[data-theme="light"] .agent-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+[data-theme="light"] #setupScreen {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,91,255,.08), transparent),
+              radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168,85,247,.06), transparent),
+              var(--bg);
+}
+[data-theme="light"] .setup-card {
+  box-shadow: 0 20px 60px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.04);
+}
+[data-theme="light"] .code-block {
+  background: #f0f2f8;
+  border-color: var(--border2);
+}
+[data-theme="light"] .download-card {
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}

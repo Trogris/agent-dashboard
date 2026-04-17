@@ -155,6 +155,24 @@ modalSave.addEventListener('click', () => {
   keyModal.style.display = 'none';
 });
 
+// ── Tema claro/escuro ──
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  document.getElementById('themeIconDark').style.display  = theme === 'light' ? 'none'  : 'block';
+  document.getElementById('themeIconLight').style.display = theme === 'light' ? 'block' : 'none';
+}
+
+// Aplica tema salvo ou preferencia do sistema
+const savedTheme = localStorage.getItem('theme') ||
+  (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+applyTheme(savedTheme);
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'light' ? 'dark' : 'light');
+});
+
 // ── View toggle ──
 document.getElementById('gridViewBtn').addEventListener('click', () => {
   viewMode = 'grid';
