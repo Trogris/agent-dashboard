@@ -113,10 +113,47 @@ function showApp() {
   appScreen.style.flexDirection = 'column';
   appScreen.style.height = '100vh';
   requestNotificationPermission();
+
+  // Tema
+  applyTheme(savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  // Voz
   applyVoiceReply(voiceReplyEnabled);
   document.getElementById('voiceReplyBtn').addEventListener('click', () => {
     applyVoiceReply(!voiceReplyEnabled);
   });
+
+  // View toggle
+  document.getElementById('gridViewBtn').addEventListener('click', () => {
+    viewMode = 'grid';
+    document.getElementById('gridViewBtn').classList.add('active');
+    document.getElementById('listViewBtn').classList.remove('active');
+    renderAgents(agents);
+  });
+  document.getElementById('listViewBtn').addEventListener('click', () => {
+    viewMode = 'list';
+    document.getElementById('listViewBtn').classList.add('active');
+    document.getElementById('gridViewBtn').classList.remove('active');
+    renderAgents(agents);
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    const filtered = q
+      ? agents.filter(a =>
+          a.name.toLowerCase().includes(q) ||
+          a.title.toLowerCase().includes(q) ||
+          a.squad.toLowerCase().includes(q)
+        )
+      : agents;
+    renderAgents(filtered);
+  });
+
   init();
 }
 
@@ -174,47 +211,16 @@ function applyVoiceReply(enabled) {
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('theme', theme);
-  document.getElementById('themeIconDark').style.display  = theme === 'light' ? 'none'  : 'block';
-  document.getElementById('themeIconLight').style.display = theme === 'light' ? 'block' : 'none';
+  const dark  = document.getElementById('themeIconDark');
+  const light = document.getElementById('themeIconLight');
+  if (dark)  dark.style.display  = theme === 'light' ? 'none'  : 'block';
+  if (light) light.style.display = theme === 'light' ? 'block' : 'none';
 }
 
-// Aplica tema salvo ou preferencia do sistema
+// Aplica tema antes mesmo do app abrir (so as variaveis CSS, sem tocar nos icones)
 const savedTheme = localStorage.getItem('theme') ||
   (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-applyTheme(savedTheme);
-
-document.getElementById('themeBtn').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'light' ? 'dark' : 'light');
-});
-
-// ── View toggle ──
-document.getElementById('gridViewBtn').addEventListener('click', () => {
-  viewMode = 'grid';
-  document.getElementById('gridViewBtn').classList.add('active');
-  document.getElementById('listViewBtn').classList.remove('active');
-  renderAgents(agents);
-});
-
-document.getElementById('listViewBtn').addEventListener('click', () => {
-  viewMode = 'list';
-  document.getElementById('listViewBtn').classList.add('active');
-  document.getElementById('gridViewBtn').classList.remove('active');
-  renderAgents(agents);
-});
-
-// ── Search ──
-document.getElementById('searchInput').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
-  const filtered = q
-    ? agents.filter(a =>
-        a.name.toLowerCase().includes(q) ||
-        a.title.toLowerCase().includes(q) ||
-        a.squad.toLowerCase().includes(q)
-      )
-    : agents;
-  renderAgents(filtered);
-});
+document.documentElement.setAttribute('data-theme', savedTheme);
 
 // ── Init ──
 async function init() {
