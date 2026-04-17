@@ -6,6 +6,8 @@ const path = require('path');
 const os = require('os');
 const axios = require('axios');
 const pdfParse = require('pdf-parse');
+const XLSX = require('xlsx');
+const officeParser = require('officeparser');
 const { runWithTools } = require('./tools');
 const { extractFileData, cleanText: cleanFileData, generateFile, deleteFile } = require('./file-generator');
 
@@ -710,6 +712,14 @@ Responda APENAS com o JSON, sem explicacoes.`;
       tmpPath = path.join(os.tmpdir(), `tg_doc_${Date.now()}_${doc.file_name || 'file'}`);
       fs.writeFileSync(tmpPath, buffer);
 
+      const isExcel = mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                      mime === 'application/vnd.ms-excel' ||
+                      /\.(xlsx|xls)$/i.test(doc.file_name || '');
+
+      const isPptx = mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                     mime === 'application/vnd.ms-powerpoint' ||
+                     /\.(pptx|ppt)$/i.test(doc.file_name || '');
+
       if (mime === 'application/pdf') {
         const parsed = await pdfParse(buffer);
         const texto = parsed.text.trim().slice(0, 12000);
@@ -717,6 +727,35 @@ Responda APENAS com o JSON, sem explicacoes.`;
         const prompt = caption
           ? `${caption}\n\n--- CONTEUDO DO PDF (${doc.file_name}) ---\n${texto}`
           : `Analise o seguinte documento PDF chamado "${doc.file_name}" e faca um resumo dos pontos principais:\n\n${texto}`;
+        if (!s.agentId) { await routeMessage(bot, chatId, prompt, s); return; }
+        await processMessage(bot, chatId, prompt, s, getCachedAgents(), openai);
+
+      } else if (isExcel) {
+        const wb = XLSX.read(buffer, { type: 'buffer' });
+        const linhas = [];
+        for (const sheetName of wb.SheetNames) {
+          const sheet = wb.Sheets[sheetName];
+          const csv = XLSX.utils.sheet_to_csv(sheet, { blankrows: false });
+          if (csv.trim()) linhas.push(`--- Aba: ${sheetName} ---\n${csv}`);
+        }
+        const texto = linhas.join('\n\n').slice(0, 12000);
+        if (!texto) { await bot.sendMessage(chatId, 'Nao consegui extrair dados desta planilha.'); return; }
+        const prompt = caption
+          ? `${caption}\n\n--- PLANILHA: ${doc.file_name} ---\n${texto}`
+          : `Analise a planilha "${doc.file_name}" e explique o que contem, destacando os principais dados e padroes:\n\n${texto}`;
+        if (!s.agentId) { await routeMessage(bot, chatId, prompt, s); return; }
+        await processMessage(bot, chatId, prompt, s, getCachedAgents(), openai);
+
+      } else if (isPptx) {
+        const texto = await new Promise((resolve, reject) => {
+          officeParser.parseOfficeAsync(tmpPath)
+            .then(data => resolve(data?.slice(0, 12000) || ''))
+            .catch(reject);
+        });
+        if (!texto.trim()) { await bot.sendMessage(chatId, 'Nao consegui extrair texto desta apresentacao.'); return; }
+        const prompt = caption
+          ? `${caption}\n\n--- APRESENTACAO: ${doc.file_name} ---\n${texto}`
+          : `Analise a apresentacao "${doc.file_name}" e faca um resumo dos slides e pontos principais:\n\n${texto}`;
         if (!s.agentId) { await routeMessage(bot, chatId, prompt, s); return; }
         await processMessage(bot, chatId, prompt, s, getCachedAgents(), openai);
 
@@ -742,7 +781,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
         await sendHumanized(bot, chatId, reply);
 
       } else {
-        await bot.sendMessage(chatId, `Formato nao suportado (${mime || 'desconhecido'}). Envie PDF, imagem ou mensagem de voz.`);
+        await bot.sendMessage(chatId, `Formato nao suportado (${mime || 'desconhecido'}). Envie PDF, Excel, PowerPoint, imagem ou mensagem de voz.`);
       }
     } catch (err) {
       console.error('Erro documento:', err.message);
