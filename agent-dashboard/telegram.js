@@ -3,6 +3,9 @@ const TelegramBot = require('node-telegram-bot-api');
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const axios = require('axios');
+const pdfParse = require('pdf-parse');
 const { runWithTools } = require('./tools');
 const { extractFileData, cleanText: cleanFileData, generateFile, deleteFile } = require('./file-generator');
 
@@ -621,6 +624,132 @@ Responda APENAS com o JSON, sem explicacoes.`;
 
     // Agente ja ativo — conversa continua normalmente
     await processMessage(bot, chatId, msg.text, s, getCachedAgents(), openai);
+  });
+
+  // ── Audio e voz: transcreve com Whisper e processa como texto ──
+  async function handleAudio(msg, fileId) {
+    const chatId = msg.chat.id;
+    const s = session(chatId);
+    let tmpPath = null;
+    try {
+      await bot.sendChatAction(chatId, 'typing');
+      const fileLink = await bot.getFileLink(fileId);
+      tmpPath = path.join(os.tmpdir(), `tg_audio_${Date.now()}.ogg`);
+      const response = await axios.get(fileLink, { responseType: 'arraybuffer' });
+      fs.writeFileSync(tmpPath, response.data);
+      const transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(tmpPath),
+        model: 'whisper-1',
+        language: 'pt'
+      });
+      const text = transcription.text?.trim();
+      if (!text) { await bot.sendMessage(chatId, 'Nao consegui entender o audio. Tente novamente.'); return; }
+      await bot.sendMessage(chatId, `_${text}_`, { parse_mode: 'Markdown' });
+      if (!s.agentId) { await routeMessage(bot, chatId, text, s); return; }
+      await processMessage(bot, chatId, text, s, getCachedAgents(), openai);
+    } catch (err) {
+      console.error('Erro audio:', err.message);
+      await bot.sendMessage(chatId, 'Erro ao processar o audio. Tente novamente.');
+    } finally {
+      if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+    }
+  }
+
+  bot.on('voice',   msg => handleAudio(msg, msg.voice.file_id));
+  bot.on('audio',   msg => handleAudio(msg, msg.audio.file_id));
+
+  // ── Imagens: envia para o modelo com visao ──
+  bot.on('photo', async (msg) => {
+    const chatId = msg.chat.id;
+    const s = session(chatId);
+    try {
+      await bot.sendChatAction(chatId, 'typing');
+      const photo = msg.photo[msg.photo.length - 1];
+      const fileLink = await bot.getFileLink(photo.file_id);
+      const caption = msg.caption || 'O que voce ve nessa imagem? Descreva e analise em detalhes.';
+      const agent = getCachedAgents().find(a => a.id === s.agentId);
+      const systemPrompt = agent
+        ? agent.systemPrompt
+        : 'Voce e um assistente especializado. Analise a imagem com atencao e responda de forma clara e util.';
+      const typingInterval = setInterval(() => bot.sendChatAction(chatId, 'typing'), 4000);
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-5.4',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...( s.messages.slice(-6) ),
+          { role: 'user', content: [
+            { type: 'text', text: caption },
+            { type: 'image_url', image_url: { url: fileLink, detail: 'high' } }
+          ]}
+        ]
+      });
+      clearInterval(typingInterval);
+      const reply = completion.choices[0].message.content;
+      s.messages.push({ role: 'user', content: caption });
+      s.messages.push({ role: 'assistant', content: reply });
+      await sendHumanized(bot, chatId, reply);
+    } catch (err) {
+      console.error('Erro imagem:', err.message);
+      await bot.sendMessage(chatId, 'Erro ao processar a imagem. Tente novamente.');
+    }
+  });
+
+  // ── Documentos: PDF extrai texto, imagens usam visao, outros nao suportados ──
+  bot.on('document', async (msg) => {
+    const chatId = msg.chat.id;
+    const s = session(chatId);
+    const doc = msg.document;
+    const mime = doc.mime_type || '';
+    const caption = msg.caption || '';
+    let tmpPath = null;
+    try {
+      await bot.sendChatAction(chatId, 'typing');
+      const fileLink = await bot.getFileLink(doc.file_id);
+      const response = await axios.get(fileLink, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(response.data);
+      tmpPath = path.join(os.tmpdir(), `tg_doc_${Date.now()}_${doc.file_name || 'file'}`);
+      fs.writeFileSync(tmpPath, buffer);
+
+      if (mime === 'application/pdf') {
+        const parsed = await pdfParse(buffer);
+        const texto = parsed.text.trim().slice(0, 12000);
+        if (!texto) { await bot.sendMessage(chatId, 'Nao consegui extrair texto deste PDF.'); return; }
+        const prompt = caption
+          ? `${caption}\n\n--- CONTEUDO DO PDF (${doc.file_name}) ---\n${texto}`
+          : `Analise o seguinte documento PDF chamado "${doc.file_name}" e faca um resumo dos pontos principais:\n\n${texto}`;
+        if (!s.agentId) { await routeMessage(bot, chatId, prompt, s); return; }
+        await processMessage(bot, chatId, prompt, s, getCachedAgents(), openai);
+
+      } else if (mime.startsWith('image/')) {
+        const base64 = buffer.toString('base64');
+        const agent = getCachedAgents().find(a => a.id === s.agentId);
+        const systemPrompt = agent?.systemPrompt || 'Voce e um assistente especializado. Analise a imagem.';
+        const typingInterval = setInterval(() => bot.sendChatAction(chatId, 'typing'), 4000);
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-5.4',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: [
+              { type: 'text', text: caption || 'Analise esta imagem em detalhes.' },
+              { type: 'image_url', image_url: { url: `data:${mime};base64,${base64}`, detail: 'high' } }
+            ]}
+          ]
+        });
+        clearInterval(typingInterval);
+        const reply = completion.choices[0].message.content;
+        s.messages.push({ role: 'user', content: caption || 'Imagem enviada' });
+        s.messages.push({ role: 'assistant', content: reply });
+        await sendHumanized(bot, chatId, reply);
+
+      } else {
+        await bot.sendMessage(chatId, `Formato nao suportado (${mime || 'desconhecido'}). Envie PDF, imagem ou mensagem de voz.`);
+      }
+    } catch (err) {
+      console.error('Erro documento:', err.message);
+      await bot.sendMessage(chatId, 'Erro ao processar o arquivo. Tente novamente.');
+    } finally {
+      if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+    }
   });
 
   bot.on('polling_error', err => {

@@ -5,6 +5,26 @@ let apiKey = localStorage.getItem('openai_key') || '';
 let viewMode = 'grid';
 let filterCategory = 'all';
 
+// ── Notificacoes do browser ──
+const NOTIFY_THRESHOLD_MS = 5000; // so notifica se demorou mais de 5s
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function notifyDone(agentName, preview) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  if (document.visibilityState === 'visible') return; // so notifica se a aba estiver em segundo plano
+  new Notification(`${agentName} respondeu`, {
+    body: preview ? preview.slice(0, 100) : 'Resposta pronta.',
+    icon: '/favicon.ico',
+    silent: false
+  });
+}
+
 // ── Squad metadata ──
 const squadMeta = {
   'c-level-squad':      { label: 'C-Level Squad',       icon: 'CL', colorClass: 'clevel'   },
@@ -92,6 +112,7 @@ function showApp() {
   appScreen.style.display = 'flex';
   appScreen.style.flexDirection = 'column';
   appScreen.style.height = '100vh';
+  requestNotificationPermission();
   init();
 }
 
@@ -848,6 +869,9 @@ async function sendMessage() {
   messages.push({ role: 'user', content: text });
   saveConversation(currentAgent.id);
 
+  const agentNameSnap = currentAgent.name;
+  const startedAt = Date.now();
+
   // Orquestradores usam /api/orchestrate; especialistas usam /api/chat
   const isOrchestrator = currentAgent.delegates && currentAgent.delegates.length > 0;
 
@@ -855,6 +879,14 @@ async function sendMessage() {
     await sendMessageOrchestrate(meta);
   } else {
     await sendMessageChat(meta);
+  }
+
+  // Notifica se demorou mais do threshold e aba estava em segundo plano
+  const elapsed = Date.now() - startedAt;
+  if (elapsed >= NOTIFY_THRESHOLD_MS) {
+    const lastMsg = messages[messages.length - 1];
+    const preview = lastMsg?.role === 'assistant' ? lastMsg.content : '';
+    notifyDone(agentNameSnap, preview);
   }
 
   isStreaming = false;
