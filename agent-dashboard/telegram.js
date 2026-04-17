@@ -4,7 +4,7 @@ const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
 const { runWithTools } = require('./tools');
-const { extractFileData, cleanText, generateFile, deleteFile } = require('./file-generator');
+const { extractFileData, cleanText: cleanFileData, generateFile, deleteFile } = require('./file-generator');
 
 const COMMANDS_DIR = path.join(__dirname, 'agents');
 const MEMORY_DIR = path.join(__dirname, 'agents', 'memory');
@@ -50,7 +50,6 @@ Geracao de arquivos:
   ]
 }
 \`\`\`
-- Para apresentacao use "type": "pptx" com "slides": [{"title": "...", "bullets": ["...", "..."] }]
 - Para PDF use "type": "pdf" com "sections": [{"title": "...", "text": "..." }] ou "bullets" ou "table"
 - O bloco file-data nao aparece para o usuario — so o arquivo gerado e enviado
 - Preencha os dados com informacao real e relevante baseada na conversa`;
@@ -337,7 +336,7 @@ async function processMessage(bot, chatId, text, s, agents, openai) {
 
     // Verifica se ha arquivo para gerar
     const fileData = extractFileData(response);
-    const visibleText = fileData ? cleanText(response) : response;
+    const visibleText = fileData ? cleanFileData(response) : response;
 
     // Envia texto primeiro
     if (visibleText) await sendHumanized(bot, chatId, visibleText);
@@ -409,7 +408,7 @@ module.exports = function setupTelegram() {
   const sessions = new Map();
 
   function session(chatId) {
-    if (!sessions.has(chatId)) sessions.set(chatId, { agentId: null, messages: [], lastSaved: 0 });
+    if (!sessions.has(chatId)) sessions.set(chatId, { agentId: null, messages: [], lastSaved: 0, greeted: false });
     return sessions.get(chatId);
   }
 
@@ -427,16 +426,24 @@ module.exports = function setupTelegram() {
       .map(a => `id: ${a.id} | nome: ${a.name} | area: ${a.title}`)
       .join('\n');
 
+    const jaFoiSaudado = s.greeted;
+
     const routerPrompt = `Voce e um roteador de conversas. Analise a mensagem do usuario e decida o que fazer.
 
 AGENTES DISPONIVEIS:
 ${agentList}
 
-REGRAS:
-1. Se for saudacao simples ("oi", "ola", "bom dia", "tudo bem", "hey") → responda com saudacao calorosa e pergunte como pode ajudar. Retorne: {"action":"greet"}
-2. Se a mensagem indica claramente um tema ou area → identifique o melhor agente e retorne: {"action":"route","agentId":"<id completo do agente>","reason":"<por que este agente>"}
-3. Se for ambiguo ou muito generico → retorne: {"action":"clarify","question":"<pergunta curta para entender melhor o que o usuario precisa>"}
+MODO ATUAL: ${jaFoiSaudado ? 'JA SAUDOU — nunca repita saudacao' : 'PRIMEIRO CONTATO'}
 
+REGRAS:
+1. Se a mensagem indica qualquer tema, problema, area ou intencao — mesmo que junto com uma saudacao — identifique o melhor agente. Retorne: {"action":"route","agentId":"<id completo>"}
+2. ${jaFoiSaudado
+  ? 'Se a mensagem for confusa, vaga ou sem nexo — tente extrair qualquer intencao e pergunte de forma diferente da anterior para entender o que a pessoa precisa. Retorne: {"action":"clarify","question":"<pergunta curta e diferente>"}'
+  : 'Se for saudacao pura sem nenhum tema ("oi", "ola", "bom dia", "hey", "tudo bem?") — retorne: {"action":"greet"}'
+}
+3. Se tiver contexto mas for ambiguo para escolher o agente — retorne: {"action":"clarify","question":"<pergunta curta e direta>"}
+
+Prefira sempre rotear (acao 1). ${jaFoiSaudado ? 'NUNCA retorne action greet.' : ''}
 Responda APENAS com o JSON, sem explicacoes.`;
 
     try {
@@ -451,47 +458,45 @@ Responda APENAS com o JSON, sem explicacoes.`;
 
       const decision = JSON.parse(r.choices[0].message.content);
 
+      // Modo 1: saudacao pura — responde uma unica vez e marca como saudado
       if (decision.action === 'greet') {
         const greetings = [
-          'Ola! Que bom ter voce aqui. Como posso ajudar hoje?',
-          'Oi! Tudo bem? Em que posso ser util?',
-          'Ola! Estou aqui. O que voce precisa hoje?',
-          'Oi, bem-vindo! Como posso te ajudar?',
-          'Ola! Pode falar — estou todo ouvidos.'
+          'Ola! Como posso te ajudar hoje?',
+          'Oi! O que voce precisa?',
+          'Ola! Em que posso ser util?',
+          'Oi, tudo certo! O que voce tem em mente?',
+          'Ola! Pode falar — estou aqui.'
         ];
+        s.greeted = true;
         await bot.sendMessage(chatId, randomFrom(greetings));
-        s.pendingRoute = true;
         return;
       }
 
+      // Modo 2: clarificacao — pergunta diferente, nunca repete saudacao
       if (decision.action === 'clarify') {
-        await bot.sendMessage(chatId, decision.question || 'Pode me contar mais sobre o que voce precisa?');
-        s.pendingRoute = true;
+        s.greeted = true;
+        await bot.sendMessage(chatId, decision.question || 'O que voce esta precisando resolver?');
         return;
       }
 
+      // Modo 3: roteamento — direciona para o agente e ja processa a mensagem
       if (decision.action === 'route' && decision.agentId) {
         const agent = agents.find(a => a.id === decision.agentId);
         if (!agent) {
-          // Agente nao encontrado — mostra menu
           await bot.sendMessage(chatId, 'Escolha uma area para comecar:', { reply_markup: squadKeyboard() });
           return;
         }
 
-        // Salva memoria do agente anterior se houver
         if (s.agentId && s.agentId !== agent.id && s.messages.length >= 4) {
           const prev = agents.find(a => a.id === s.agentId);
           if (prev) autoSaveMemory(prev, s.messages, openai);
         }
 
-        // Ativa o novo agente
-        Object.assign(s, { agentId: agent.id, messages: [], lastSaved: 0, pendingRoute: false });
+        Object.assign(s, { agentId: agent.id, messages: [], lastSaved: 0, greeted: false });
 
-        // Handoff humanizado
         await bot.sendMessage(chatId, randomFrom(HANDOFF_MESSAGES)(agent.name));
         await sleep(700);
 
-        // Ja processa a mensagem original — nao pede para repetir
         await processMessage(bot, chatId, text, s, agents, openai);
         return;
       }
@@ -509,7 +514,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
       const agent = getCachedAgents().find(a => a.id === s.agentId);
       if (agent) autoSaveMemory(agent, s.messages, openai);
     }
-    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, greeted: false });
     await bot.sendMessage(msg.chat.id, randomFrom(START_GREETINGS));
   });
 
@@ -519,7 +524,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
       const agent = getCachedAgents().find(a => a.id === s.agentId);
       if (agent) autoSaveMemory(agent, s.messages, openai);
     }
-    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, greeted: false });
     await bot.sendMessage(msg.chat.id, 'Escolha uma area:', { reply_markup: squadKeyboard() });
   });
 
@@ -529,7 +534,7 @@ Responda APENAS com o JSON, sem explicacoes.`;
       const agent = getCachedAgents().find(a => a.id === s.agentId);
       if (agent) autoSaveMemory(agent, s.messages, openai);
     }
-    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, pendingRoute: false });
+    Object.assign(s, { agentId: null, messages: [], lastSaved: 0, greeted: false });
     await bot.sendMessage(msg.chat.id, 'Com qual area voce quer falar agora?', { reply_markup: squadKeyboard() });
   });
 
@@ -608,9 +613,8 @@ Responda APENAS com o JSON, sem explicacoes.`;
     if (!msg.text || msg.text.startsWith('/')) return;
     const s = session(chatId);
 
-    // Sem agente ativo ou veio de saudacao/clarificacao — roteia automaticamente
-    if (!s.agentId || s.pendingRoute) {
-      s.pendingRoute = false;
+    // Sem agente ativo — roteia automaticamente
+    if (!s.agentId) {
       await routeMessage(bot, chatId, msg.text, s);
       return;
     }
