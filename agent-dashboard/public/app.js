@@ -113,6 +113,10 @@ function showApp() {
   appScreen.style.flexDirection = 'column';
   appScreen.style.height = '100vh';
   requestNotificationPermission();
+  applyVoiceReply(voiceReplyEnabled);
+  document.getElementById('voiceReplyBtn').addEventListener('click', () => {
+    applyVoiceReply(!voiceReplyEnabled);
+  });
   init();
 }
 
@@ -160,14 +164,11 @@ function applyVoiceReply(enabled) {
   voiceReplyEnabled = enabled;
   localStorage.setItem('voiceReply', enabled);
   const btn = document.getElementById('voiceReplyBtn');
+  if (!btn) return;
   btn.style.color = enabled ? '#635bff' : '';
   btn.style.borderColor = enabled ? '#635bff' : '';
   btn.title = enabled ? 'Respostas em audio (ativo)' : 'Respostas em audio';
 }
-applyVoiceReply(voiceReplyEnabled);
-document.getElementById('voiceReplyBtn').addEventListener('click', () => {
-  applyVoiceReply(!voiceReplyEnabled);
-});
 
 // ── Tema claro/escuro ──
 function applyTheme(theme) {
