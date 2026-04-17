@@ -52,10 +52,39 @@ function getMemoryContent(agentId) {
   return content || null;
 }
 
+const WEB_SUFFIX = `
+
+---
+GERACAO DE ARQUIVOS — INSTRUCAO OBRIGATORIA:
+Quando o usuario pedir planilha, relatorio PDF ou apresentacao, inclua na sua resposta um bloco com os dados estruturados no formato abaixo. Este bloco nao aparece para o usuario — o sistema detecta e gera o arquivo automaticamente.
+
+\`\`\`file-data
+{
+  "type": "xlsx",
+  "filename": "nome_do_arquivo",
+  "title": "Titulo",
+  "sheets": [
+    {
+      "name": "Nome da aba",
+      "rows": [
+        ["Coluna 1", "Coluna 2"],
+        ["dado1", "dado2"]
+      ]
+    }
+  ]
+}
+\`\`\`
+
+Para PDF use "type": "pdf" com "sections": [{"title": "...", "text": "..."}] ou "bullets": ["..."] ou "table": [[...]]
+Para PowerPoint use "type": "pptx" com "slides": [{"title": "...", "bullets": ["...", "..."]}]
+Preencha sempre com dados reais e relevantes baseados na conversa.`;
+
 function buildSystemPrompt(systemPrompt, agentId) {
   const memory = getMemoryContent(agentId);
-  if (!memory) return systemPrompt;
-  return `${systemPrompt}\n\n---\nMEMORIA PERSISTENTE — CONTEXTO ACUMULADO:\n${memory}`;
+  const base = memory
+    ? `${systemPrompt}\n\n---\nMEMORIA PERSISTENTE — CONTEXTO ACUMULADO:\n${memory}`
+    : systemPrompt;
+  return base + WEB_SUFFIX;
 }
 
 function extractRole(content) {
