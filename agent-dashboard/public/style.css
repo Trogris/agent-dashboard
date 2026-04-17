@@ -814,3 +814,26 @@ body {
   background: var(--surface);
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
+
+/* ── Botao microfone ── */
+#micBtn {
+  width: 34px; height: 34px; flex-shrink: 0;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s;
+  color: var(--text2);
+}
+#micBtn:hover { color: var(--text); border-color: #635bff; }
+#micBtn.recording {
+  background: rgba(239,68,68,.15);
+  border-color: #ef4444;
+  color: #ef4444;
+  animation: mic-pulse .8s ease-in-out infinite;
+}
+#micBtn:disabled { opacity: .3; cursor: not-allowed; }
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}

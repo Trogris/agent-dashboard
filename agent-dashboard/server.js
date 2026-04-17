@@ -4,13 +4,17 @@ const express = require('express');
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { exec } = require('child_process');
 const crypto = require('crypto');
+const multer = require('multer');
 const { TOOL_DEFINITIONS, executeTool } = require('./tools');
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+const upload = multer({ dest: os.tmpdir() });
 
 const COMMANDS_DIR = path.join(__dirname, 'agents');
 const OUTPUTS_DIR = path.join(__dirname, 'outputs');
@@ -611,6 +615,45 @@ app.get('/api/files', (req, res) => {
     .sort((a, b) => new Date(b.created) - new Date(a.created));
 
   res.json(files);
+});
+
+// ── Transcricao de audio (Whisper) ──
+app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+  const openai = new OpenAI({ apiKey: req.body.apiKey || process.env.OPENAI_API_KEY });
+  try {
+    const transcription = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(req.file.path),
+      model: 'whisper-1',
+      language: 'pt'
+    });
+    res.json({ text: transcription.text });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    fs.unlink(req.file.path, () => {});
+  }
+});
+
+// ── TTS: texto para audio ──
+app.post('/api/speak', async (req, res) => {
+  const { text, voice, apiKey } = req.body;
+  if (!text) return res.status(400).json({ error: 'Texto obrigatorio' });
+  const openai = new OpenAI({ apiKey: apiKey || process.env.OPENAI_API_KEY });
+  try {
+    const mp3 = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: voice || 'alloy',
+      input: text.slice(0, 4000),
+      response_format: 'mp3',
+      speed: 1.0
+    });
+    const buffer = Buffer.from(await mp3.arrayBuffer());
+    res.set('Content-Type', 'audio/mpeg');
+    res.send(buffer);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Streaming sem buffer no Vercel

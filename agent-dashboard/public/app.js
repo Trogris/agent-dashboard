@@ -155,6 +155,20 @@ modalSave.addEventListener('click', () => {
   keyModal.style.display = 'none';
 });
 
+// ── Toggle resposta em voz ──
+function applyVoiceReply(enabled) {
+  voiceReplyEnabled = enabled;
+  localStorage.setItem('voiceReply', enabled);
+  const btn = document.getElementById('voiceReplyBtn');
+  btn.style.color = enabled ? '#635bff' : '';
+  btn.style.borderColor = enabled ? '#635bff' : '';
+  btn.title = enabled ? 'Respostas em audio (ativo)' : 'Respostas em audio';
+}
+applyVoiceReply(voiceReplyEnabled);
+document.getElementById('voiceReplyBtn').addEventListener('click', () => {
+  applyVoiceReply(!voiceReplyEnabled);
+});
+
 // ── Tema claro/escuro ──
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -857,6 +871,119 @@ function addTyping() {
   return msg;
 }
 
+// ── Voz no browser ──
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let voiceReplyEnabled = localStorage.getItem('voiceReply') === 'true';
+
+async function playAudioResponse(text) {
+  if (!voiceReplyEnabled) return;
+  try {
+    const voice = getVoiceForAgent(currentAgent);
+    const clean = text
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`[^`]+`/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/\n{2,}/g, ' ')
+      .trim()
+      .slice(0, 4000);
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: clean, voice, apiKey })
+    });
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.play();
+  } catch {}
+}
+
+function getVoiceForAgent(agent) {
+  if (!agent) return 'alloy';
+  const voiceMap = {
+    'geral':               'shimmer',
+    'industrial':          'shimmer',
+    'c-level-squad':       'onyx',
+    'advisory-board':      'onyx',
+    'hormozi-squad':       'onyx',
+    'copy-master':         'fable',
+    'copy-squad':          'fable',
+    'storytelling':        'fable',
+    'brand-squad':         'nova',
+    'traffic-masters':     'echo',
+    'data-squad':          'alloy',
+    'design-squad':        'nova',
+    'cybersecurity':       'echo',
+    'claude-code-mastery': 'alloy',
+    'movement':            'shimmer',
+    'problem-solver-squad':'echo',
+  };
+  return voiceMap[agent.squad] || 'alloy';
+}
+
+const micBtn = document.getElementById('micBtn');
+
+micBtn.addEventListener('click', async () => {
+  if (isRecording) {
+    // Para gravacao
+    mediaRecorder.stop();
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      isRecording = false;
+      micBtn.classList.remove('recording');
+      micBtn.disabled = true;
+      stream.getTracks().forEach(t => t.stop());
+
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, 'audio.webm');
+      if (apiKey) formData.append('apiKey', apiKey);
+
+      try {
+        const res = await fetch('/api/transcribe', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.text) {
+          document.getElementById('userInput').value = data.text;
+          document.getElementById('userInput').dispatchEvent(new Event('input'));
+          // Envia automaticamente
+          sendMessage();
+        }
+      } catch (err) {
+        console.error('Transcricao falhou:', err);
+      } finally {
+        micBtn.disabled = false;
+      }
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    micBtn.classList.add('recording');
+
+    // Para automaticamente apos 60s
+    setTimeout(() => { if (isRecording && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 60000);
+
+  } catch (err) {
+    alert('Permita acesso ao microfone para usar esta funcao.');
+  }
+});
+
 // ── Send ──
 let isStreaming = false;
 
@@ -1042,11 +1169,11 @@ async function sendMessageChat(meta) {
     toolStatus.remove();
 
     if (fileDetected) {
-      // Mostra so o card de download, sem texto
       bubble.innerHTML = '';
       await handleFileData(fullContent, messagesEl);
     } else {
       renderMessageContent(bubble, fullContent);
+      await playAudioResponse(fullContent);
     }
     messagesEl.scrollTop = messagesEl.scrollHeight;
     messages.push({ role: 'assistant', content: fullContent });
@@ -1140,6 +1267,7 @@ async function sendMessageOrchestrate(meta) {
       } else {
         renderMessageContent(bubble, fullContent);
         await handleFileData(fullContent, messagesEl);
+        await playAudioResponse(fullContent);
       }
       messagesEl.scrollTop = messagesEl.scrollHeight;
     } else {
