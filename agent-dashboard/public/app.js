@@ -423,8 +423,128 @@ async function executeJavaScript(code) {
   await fn();
 }
 
+// ── Converte markdown basico para HTML ──
+function parseMarkdown(text) {
+  return text
+    .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.*?)__/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .replace(/^#{1,6}\s+(.+)$/gm, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ── Gera arquivo no browser a partir do bloco file-data ──
+async function generateFileInBrowser(fileData) {
+  const type = fileData.type;
+
+  if (type === 'xlsx') {
+    const wb = XLSX.utils.book_new();
+    const sheets = fileData.sheets || [{ name: 'Dados', rows: fileData.rows || [] }];
+    for (const sheet of sheets) {
+      const ws = XLSX.utils.aoa_to_sheet(sheet.rows || []);
+      XLSX.utils.book_append_sheet(wb, ws, sheet.name || 'Planilha');
+    }
+    XLSX.writeFile(wb, `${fileData.filename || 'arquivo'}.xlsx`);
+    return;
+  }
+
+  if (type === 'pdf') {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const title = fileData.title || 'Relatorio';
+    const sections = fileData.sections || [];
+
+    doc.setFillColor(26, 26, 46);
+    doc.rect(0, 0, 210, 22, 'F');
+    doc.setFontSize(16); doc.setTextColor(255, 255, 255);
+    doc.text(title, 14, 14);
+    doc.setFontSize(8); doc.setTextColor(170, 170, 200);
+    doc.text(new Date().toLocaleDateString('pt-BR'), 196, 14, { align: 'right' });
+
+    let y = 30;
+    doc.setTextColor(50, 50, 50);
+
+    for (const section of sections) {
+      if (y > 270) { doc.addPage(); y = 20; }
+
+      if (section.title) {
+        doc.setFontSize(13); doc.setFont(undefined, 'bold');
+        doc.text(section.title, 14, y); y += 2;
+        doc.setDrawColor(26, 26, 46); doc.setLineWidth(0.4);
+        doc.line(14, y, 196, y); y += 6;
+        doc.setFont(undefined, 'normal');
+      }
+      if (section.text) {
+        doc.setFontSize(10);
+        const lines = doc.splitTextToSize(section.text, 182);
+        doc.text(lines, 14, y); y += lines.length * 5 + 4;
+      }
+      if (section.bullets) {
+        doc.setFontSize(10);
+        for (const b of section.bullets) {
+          if (y > 270) { doc.addPage(); y = 20; }
+          const lines = doc.splitTextToSize(`• ${b}`, 178);
+          doc.text(lines, 18, y); y += lines.length * 5 + 2;
+        }
+        y += 2;
+      }
+      if (section.table && section.table.length > 0) {
+        doc.autoTable({
+          startY: y,
+          head: [section.table[0]],
+          body: section.table.slice(1),
+          theme: 'striped',
+          headStyles: { fillColor: [26, 26, 46], textColor: 255, fontSize: 9 },
+          bodyStyles: { fontSize: 9 },
+          margin: { left: 14, right: 14 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+      }
+    }
+    doc.save(`${fileData.filename || 'relatorio'}.pdf`);
+    return;
+  }
+
+  if (type === 'pptx') {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_16x9';
+    const title = fileData.title || 'Apresentacao';
+
+    const cover = pptx.addSlide();
+    cover.background = { color: '1a1a2e' };
+    cover.addText(title, { x: 0.5, y: 2.8, w: 9, h: 1.2, fontSize: 36, bold: true, color: 'FFFFFF', align: 'center' });
+    if (fileData.subtitle) {
+      cover.addText(fileData.subtitle, { x: 0.5, y: 4.1, w: 9, h: 0.6, fontSize: 16, color: 'AAAACC', align: 'center' });
+    }
+
+    for (const s of (fileData.slides || [])) {
+      const slide = pptx.addSlide();
+      slide.background = { color: 'FFFFFF' };
+      slide.addText(s.title || '', { x: 0.4, y: 0.2, w: 9.2, h: 0.7, fontSize: 22, bold: true, color: '1a1a2e' });
+      slide.addShape(pptx.ShapeType.rect, { x: 0.4, y: 0.95, w: 9.2, h: 0.04, fill: { color: '1a1a2e' } });
+
+      if (s.bullets && s.bullets.length > 0) {
+        slide.addText(s.bullets.map(b => ({ text: b, options: { bullet: true } })), {
+          x: 0.6, y: 1.1, w: 8.8, h: 5, fontSize: 14, color: '333333', valign: 'top', paraSpaceAfter: 8
+        });
+      } else if (s.text) {
+        slide.addText(s.text, { x: 0.6, y: 1.1, w: 8.8, h: 5, fontSize: 14, color: '333333', valign: 'top' });
+      }
+    }
+    await pptx.writeFile({ fileName: `${fileData.filename || 'apresentacao'}.pptx` });
+    return;
+  }
+
+  throw new Error(`Tipo nao suportado: ${type}`);
+}
+
 // ── Detecta e renderiza blocos de código com botão de execução ──
 function renderMessageContent(bubble, content) {
+  // Remove bloco file-data da exibicao
+  content = content.replace(/```file-data[\s\S]*?```/gi, '').trim();
+
   // Detecta python e javascript
   const codeRegex = /```(python|javascript)\n([\s\S]*?)```/g;
   let lastIndex = 0;
@@ -535,17 +655,71 @@ function renderMessageContent(bubble, content) {
     lastIndex = match.index + match[0].length;
   }
 
-  // Texto após o último bloco
+  // Texto apos o ultimo bloco
   if (lastIndex < content.length) {
     const textNode = document.createElement('p');
     textNode.style.cssText = 'margin:0;white-space:pre-wrap;';
-    textNode.textContent = content.slice(lastIndex);
+    textNode.innerHTML = parseMarkdown(content.slice(lastIndex));
     bubble.appendChild(textNode);
   }
 
   if (!hasCode) {
-    bubble.textContent = content;
+    const p = document.createElement('p');
+    p.style.cssText = 'margin:0;white-space:pre-wrap;';
+    p.innerHTML = parseMarkdown(content);
+    bubble.appendChild(p);
   }
+}
+
+// ── Detecta file-data na resposta e gera card de download ──
+async function handleFileData(content, messagesEl) {
+  const match = content.match(/```file-data\s*([\s\S]*?)```/i);
+  if (!match) return;
+  let fileData;
+  try { fileData = JSON.parse(match[1].trim()); } catch { return; }
+
+  const ext = fileData.type;
+  const labels = { xlsx: 'Excel', pdf: 'PDF', pptx: 'PowerPoint' };
+  const icons  = { xlsx: 'XLS',   pdf: 'PDF', pptx: 'PPT' };
+  const cls    = { xlsx: 'file-xlsx', pdf: 'file-pdf', pptx: 'file-pptx' };
+
+  const card = document.createElement('div');
+  card.className = 'download-card';
+  card.innerHTML = `
+    <div class="download-file-icon ${cls[ext] || 'file-default'}">${icons[ext] || ext.toUpperCase()}</div>
+    <div class="download-info">
+      <div class="download-filename">${fileData.filename || 'arquivo'}.${ext}</div>
+      <div class="download-meta">${labels[ext] || ext} · pronto para baixar</div>
+    </div>
+    <button class="download-action-btn" id="dlBtn_${Date.now()}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7,10 12,15 17,10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Baixar
+    </button>`;
+
+  const btn = card.querySelector('button');
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Gerando...';
+    try {
+      await generateFileInBrowser(fileData);
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20,6 9,17 4,12"/></svg> Baixado`;
+    } catch (e) {
+      btn.textContent = 'Erro — tentar novamente';
+      btn.disabled = false;
+    }
+  });
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'margin-top:10px;';
+  wrapper.appendChild(card);
+
+  const lastMsg = messagesEl.lastElementChild;
+  if (lastMsg) lastMsg.querySelector('.msg-bubble')?.appendChild(wrapper);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 function buildDownloadCard(f) {
@@ -687,11 +861,6 @@ async function sendMessage() {
   sendBtn.disabled = false;
   document.getElementById('userInput').focus();
 
-  // Mostra botao de salvar memoria apos primeira resposta
-  if (messages.length >= 2) {
-    document.getElementById('consolidateBtn').style.display = 'inline-flex';
-  }
-
   // Auto-salva a cada 10 mensagens em background
   if (messages.length > 0 && messages.length % 10 === 0) {
     autoConsolidateMemory(currentAgent, [...messages]);
@@ -809,6 +978,7 @@ async function sendMessageChat(meta) {
 
     toolStatus.remove();
     renderMessageContent(bubble, fullContent);
+    await handleFileData(fullContent, messagesEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     messages.push({ role: 'assistant', content: fullContent });
     saveConversation(currentAgent.id);
@@ -884,6 +1054,7 @@ async function sendMessageOrchestrate(meta) {
 
     if (bubble) {
       renderMessageContent(bubble, fullContent);
+      await handleFileData(fullContent, messagesEl);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     } else {
       typing.remove();
