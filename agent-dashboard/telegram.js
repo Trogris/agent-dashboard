@@ -338,6 +338,41 @@ function agentKeyboard(agents, squad) {
   return { inline_keyboard: rows };
 }
 
+// ── TTS: converte texto em audio e envia como mensagem de voz ──
+async function sendVoiceReply(bot, openai, chatId, text, voice) {
+  let tmpPath = null;
+  try {
+    const clean = text
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`[^`]+`/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/\n{2,}/g, ' ')
+      .trim()
+      .slice(0, 4000);
+
+    const mp3 = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: voice || 'alloy',
+      input: clean,
+      response_format: 'opus',
+      speed: 1.0
+    });
+
+    tmpPath = path.join(os.tmpdir(), `tg_tts_${Date.now()}.ogg`);
+    const buffer = Buffer.from(await mp3.arrayBuffer());
+    fs.writeFileSync(tmpPath, buffer);
+    await bot.sendVoice(chatId, tmpPath);
+  } catch (err) {
+    console.error('Erro TTS:', err.message);
+  } finally {
+    if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  }
+}
+
 // ── Processamento de mensagem (reutilizado por texto e botoes) ──
 async function processMessage(bot, chatId, text, s, agents, openai, replyWithVoice = false) {
   const agent = agents.find(a => a.id === s.agentId);
@@ -377,7 +412,7 @@ async function processMessage(bot, chatId, text, s, agents, openai, replyWithVoi
     // Envia resposta — voz ou texto
     const useVoice = replyWithVoice || s.voiceMode;
     if (useVoice && visibleText && !fileData) {
-      await sendVoiceReply(chatId, visibleText, getAgentVoice(agent));
+      await sendVoiceReply(bot, openai, chatId, visibleText, getAgentVoice(agent));
     } else if (visibleText) {
       await sendHumanized(bot, chatId, visibleText);
     }
@@ -453,40 +488,6 @@ module.exports = function setupTelegram() {
     return sessions.get(chatId);
   }
 
-  // ── TTS: converte texto em audio e envia como mensagem de voz ──
-  async function sendVoiceReply(chatId, text, voice) {
-    let tmpPath = null;
-    try {
-      const clean = text
-        .replace(/```[\s\S]*?```/g, '')   // remove blocos de codigo
-        .replace(/`[^`]+`/g, '')           // remove inline code
-        .replace(/\*\*(.*?)\*\*/g, '$1')   // remove bold
-        .replace(/__(.*?)__/g, '$1')
-        .replace(/\*(.*?)\*/g, '$1')
-        .replace(/_(.*?)_/g, '$1')
-        .replace(/^#{1,6}\s+/gm, '')
-        .replace(/\n{2,}/g, ' ')
-        .trim()
-        .slice(0, 4000); // limite da API
-
-      const mp3 = await openai.audio.speech.create({
-        model: 'tts-1',
-        voice: voice || 'alloy',
-        input: clean,
-        response_format: 'opus',
-        speed: 1.0
-      });
-
-      tmpPath = path.join(os.tmpdir(), `tg_tts_${Date.now()}.ogg`);
-      const buffer = Buffer.from(await mp3.arrayBuffer());
-      fs.writeFileSync(tmpPath, buffer);
-      await bot.sendVoice(chatId, tmpPath);
-    } catch (err) {
-      console.error('Erro TTS:', err.message);
-    } finally {
-      if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
-    }
-  }
 
   // Pre-carrega agentes ao iniciar
   getCachedAgents();
